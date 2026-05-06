@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { Book } from '../models/types.ts'; // <-- NEW: Importing our Book type
+
+// NEW: Define the shape of our form state specifically
+interface BookFormData {
+  title: string;
+  author: string;
+  isbn: string;
+  genre: string;
+  numOfTotalCopies: string | number; // String while typing, number when sending
+  coverImageUrl: string;
+}
 
 function AdminBooksPage() {
   const navigate = useNavigate();
-  const [books, setBooks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   
-  // UI States
-  const [showForm, setShowForm] = useState(false);
-  const [editingBook, setEditingBook] = useState(null);
-  const [formError, setFormError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // NEW: Added <Book[]> so TS knows this is an array of Books
+  const [books, setBooks] = useState<Book[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  const [showForm, setShowForm] = useState<boolean>(false);
+  // NEW: TS knows this can either be a Book object or null
+  const [editingBook, setEditingBook] = useState<Book | null>(null);
+  const [formError, setFormError] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Form Data State - Includes ONLY the fields you specified can be updated
-  const [formData, setFormData] = useState({
+  // NEW: Added <BookFormData>
+  const [formData, setFormData] = useState<BookFormData>({
     title: '',
     author: '',
     isbn: '',
@@ -22,13 +35,13 @@ function AdminBooksPage() {
     coverImageUrl: ''
   });
 
-  // Extracted fetch function so we can reuse it to refresh the list after an update
   const fetchBooks = async () => {
     setIsLoading(true);
     try {
       const response = await fetch('http://localhost:8080/get-all-books'); 
       if (response.ok) {
-        const data = await response.json();
+        // NEW: Tell TS that the parsed JSON is an array of Books
+        const data: Book[] = await response.json();
         setBooks(data);
       }
     } catch (err) {
@@ -42,10 +55,8 @@ function AdminBooksPage() {
     fetchBooks();
   }, []);
 
-  // --- Handlers ---
-
-  // Update formData state when user types
-  const handleInputChange = (e) => {
+  // NEW: Defined the 'e' parameter as an Input Element Change Event
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -53,11 +64,11 @@ function AdminBooksPage() {
     }));
   };
 
-  const handleEditClick = (book) => {
+  // NEW: Defined the 'book' parameter as a Book
+  const handleEditClick = (book: Book) => {
     setFormError('');
     setEditingBook(book);
     
-    // Pre-fill the form with the selected book's data
     setFormData({
       title: book.title || '',
       author: book.author || '',
@@ -68,14 +79,12 @@ function AdminBooksPage() {
     });
     
     setShowForm(true);
-    // Scroll to top smoothly so admin sees the form
     window.scrollTo({ top: 0, behavior: 'smooth' }); 
   };
 
   const handleAddNewClick = () => {
     setFormError('');
     setEditingBook(null);
-    // Clear the form
     setFormData({ title: '', author: '', isbn: '', genre: '', numOfTotalCopies: '', coverImageUrl: '' });
     setShowForm(true);
   };
@@ -86,22 +95,19 @@ function AdminBooksPage() {
     setFormError('');
   };
 
-  // Form Submission (The API Call)
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent page reload
+  // NEW: Defined the 'e' parameter as a Form Submission Event
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); 
     setIsSubmitting(true);
     setFormError('');
 
-    // Ensure numeric fields are actually numbers before sending to backend
     const payload = {
       ...formData,
-      numOfTotalCopies: parseInt(formData.numOfTotalCopies, 10)
+      numOfTotalCopies: parseInt(formData.numOfTotalCopies as string, 10)
     };
 
     try {
       if (editingBook) {
-        // --- UPDATE BOOK LOGIC (PUT) ---
-        // Change this URL if your specific backend update endpoint is named differently
         const response = await fetch(`http://localhost:8080/update-book/${editingBook.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -109,13 +115,12 @@ function AdminBooksPage() {
         });
 
         if (response.ok) {
-          setShowForm(false); // Hide form
-          fetchBooks(); // Refresh the books list to show the new data!
+          setShowForm(false); 
+          fetchBooks(); 
         } else {
           setFormError('Failed to update the book. Check backend logs.');
         }
       } else {
-        // --- ADD NEW BOOK LOGIC (POST) ---
         const response = await fetch("http://localhost:8080/create-book", {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -147,7 +152,6 @@ function AdminBooksPage() {
         </button>
       </div>
 
-      {/* ADD / UPDATE FORM */}
       {showForm && (
         <div className="admin-form-container">
           <h2>{editingBook ? 'Update Book Details' : 'Add New Book'}</h2>
@@ -197,7 +201,6 @@ function AdminBooksPage() {
         </div>
       )}
 
-      {/* BOOKS LIST */}
       <div className="books-container" style={{ marginTop: '20px' }}>
         <h2>Library Inventory</h2>
         {isLoading ? <p>Loading...</p> : (
@@ -206,12 +209,11 @@ function AdminBooksPage() {
               <div key={book.id} className="book-card">
                 <h3 className="book-title">{book.title}</h3>
                 <p className="book-detail"><strong>Author:</strong> {book.author}</p>
-                <p className="book-detail"><strong>Genre:</strong> {book.genre}</p>
+                <p className="book-detail"><strong>Genre:</strong> {book.genre || 'N/A'}</p>
                 <p className="book-detail"><strong>ISBN:</strong> {book.isbn}</p>
                 <p className="book-detail"><strong>Available:</strong> {book.numOfCopiesAvailable} / {book.numOfTotalCopies}</p>
                 
                 <div style={{ marginTop: '20px' }}>
-                  {/* Clicking this sets the editingBook and opens the form */}
                   <button 
                     className="login-btn user-btn" 
                     style={{ width: '100%', padding: '8px' }}

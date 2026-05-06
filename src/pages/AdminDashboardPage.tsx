@@ -1,7 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function AdminDashboardPage() {
+// NEW: We added `: React.FC` to explicitly tell TypeScript 
+// that this is a React Function Component.
+const AdminDashboardPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
@@ -35,6 +37,6 @@ function AdminDashboardPage() {
       </button>
     </div>
   );
-}
+};
 
 export default AdminDashboardPage;

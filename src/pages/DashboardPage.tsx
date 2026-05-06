@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function DashboardPage() {
+// NEW: Added React.FC to type this as a Functional Component
+const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
 
+  // TypeScript automatically infers that this function returns nothing (void)
   const handleLogout = () => {
     navigate('/'); 
   };
@@ -14,11 +16,12 @@ function DashboardPage() {
       <p>Welcome inside! Here you will manage your library.</p>
       
       <div className="button-group" style={{ marginTop: '30px' }}>
-        {/* Update this button with onClick */}
         <button className="login-btn user-btn" onClick={() => navigate('/books')}>
           Books
         </button>
-        <button className="login-btn user-btn">Reservations</button>
+        <button className="login-btn user-btn" onClick={() => navigate('/my-reservations')}>
+          Reservations
+        </button>
       </div>
 
       <button 
@@ -30,6 +33,6 @@ function DashboardPage() {
       </button>
     </div>
   );
-}
+};
 
 export default DashboardPage;

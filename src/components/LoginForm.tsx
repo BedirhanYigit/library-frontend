@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
 
-function LoginForm({ loginType, onSubmit, onBack, errorMessage }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+// NEW: Define an Interface specifically for the Props this component receives!
+interface LoginFormProps {
+  loginType: 'user' | 'admin';
+  onSubmit: (email: string, password: string) => void; // A function that takes two strings and returns nothing
+  onBack: () => void; // A simple function with no parameters
+  errorMessage: string;
+}
 
-  const handleSubmit = (e) => {
+// NEW: Pass the interface into React.FC so it knows what props to expect
+const LoginForm: React.FC<LoginFormProps> = ({ loginType, onSubmit, onBack, errorMessage }) => {
+  // Explicitly type the state as strings
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+
+  // NEW: Type the form submission event
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit(email, password);
   };
@@ -20,7 +31,8 @@ function LoginForm({ loginType, onSubmit, onBack, errorMessage }) {
         <input 
           type="email" 
           value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
+          // NEW: Type the input change event
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)} 
           required 
         />
       </div>
@@ -30,7 +42,7 @@ function LoginForm({ loginType, onSubmit, onBack, errorMessage }) {
         <input 
           type="password" 
           value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} 
           required 
         />
       </div>
@@ -43,6 +55,6 @@ function LoginForm({ loginType, onSubmit, onBack, errorMessage }) {
       </div>
     </form>
   );
-}
+};
 
 export default LoginForm;

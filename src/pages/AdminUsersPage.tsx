@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { User } from '../models/types.ts'; 
 
-function AdminUsersPage() {
+const AdminUsersPage: React.FC = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  
+  // NEW: Added <User[]> to tell TS this array holds User objects
+  const [users, setUsers] = useState<User[]>([]);
+  // NEW: Explicitly typed boolean and string/null states
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Ensure this matches the endpoint in your AdminController!
         const response = await fetch('http://localhost:8080/get-all-users'); 
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
+        // NEW: Tell TS that the parsed JSON matches our User array structure
+        const data: User[] = await response.json();
         setUsers(data);
         setError(null);
       } catch (err) {
@@ -50,7 +54,6 @@ function AdminUsersPage() {
         )}
 
         {!isLoading && !error && users.length > 0 && (
-          /* Reusing the grid and card CSS from the Books page! */
           <div className="books-grid">
             {users.map((user) => (
               <div key={user.id} className="book-card">
@@ -65,6 +68,6 @@ function AdminUsersPage() {
       </div>
     </div>
   );
-}
+};
 
 export default AdminUsersPage;

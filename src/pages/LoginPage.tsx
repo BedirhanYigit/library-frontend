@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LoginForm from '../components/LoginForm';
+import LoginForm from '../components/LoginForm.tsx'; // Assuming this is still .jsx or .tsx, both are fine!
 
-function LoginPage() {
-  const [currentView, setCurrentView] = useState('selection'); 
-  const [errorMessage, setErrorMessage] = useState('');
+// NEW: Define exactly what string values our view state can hold
+type ViewState = 'selection' | 'user-login' | 'admin-login';
+
+const LoginPage: React.FC = () => {
+  // NEW: Apply the ViewState type to our state
+  const [currentView, setCurrentView] = useState<ViewState>('selection'); 
+  const [errorMessage, setErrorMessage] = useState<string>('');
   
   const navigate = useNavigate();
 
-  const handleLoginSubmit = async (email, password) => {
+  // NEW: Specify that email and password must be strings
+  const handleLoginSubmit = async (email: string, password: string) => {
     setErrorMessage(''); 
-    
     const endpoint = currentView === 'user-login' 
       ? 'http://localhost:8080/login' 
       : 'http://localhost:8080/admin-login';
@@ -23,16 +27,16 @@ function LoginPage() {
       });
 
       if (response.ok) {
-        // NEW: Extract the user data from the backend response
-        const data = await response.json();
+        // NEW: Tell TypeScript that our backend responds with at least an 'id'
+        const data: { id: string } = await response.json();
         
         if (currentView === 'admin-login') {
-          // Save admin ID just in case we need it later
-          localStorage.setItem('userId', data.id); 
+          // localStorage always expects strings, so if your ID is a number from backend,
+          // it implicitly gets converted, but we typed it as string above to be safe.
+          localStorage.setItem('userId', data.id.toString()); 
           navigate('/admin-dashboard');
         } else {
-          // Save the normal User ID so we can use it to loan books!
-          localStorage.setItem('userId', data.id); 
+          localStorage.setItem('userId', data.id.toString()); 
           navigate('/dashboard');
         }
       } else {
@@ -49,10 +53,17 @@ function LoginPage() {
   };
 
   return (
-    <main className="login-section">
+    <main className="login-section" style={{ position: 'relative' }}>
+      
+      {/* Top Right Sign Up Button */}
+      <div className="top-right-action">
+        <span style={{ marginRight: '15px', fontWeight: '600', color: '#475569' }}>New to the library?</span>
+        <button className="login-btn user-btn" style={{ padding: '8px 20px' }} onClick={() => navigate('/signup')}>
+          Sign Up
+        </button>
+      </div>
+
       <div className="login-card">
-        
-        {/* VIEW: Selection */}
         {currentView === 'selection' && (
           <>
             <h2>Select Login Type</h2>
@@ -67,7 +78,6 @@ function LoginPage() {
           </>
         )}
 
-        {/* VIEW: Form */}
         {(currentView === 'user-login' || currentView === 'admin-login') && (
           <LoginForm 
             loginType={currentView === 'user-login' ? 'user' : 'admin'}
@@ -76,10 +86,9 @@ function LoginPage() {
             errorMessage={errorMessage}
           />
         )}
-
       </div>
     </main>
   );
-}
+};
 
 export default LoginPage;
