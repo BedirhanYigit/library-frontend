@@ -145,6 +145,7 @@ function SignUpPage() {
               <label htmlFor={"address"}>Physical Address *</label>
 
               <textarea
+                id="address"
                 name="address"
                 value={formData.address}
                 onChange={handleInputChange}

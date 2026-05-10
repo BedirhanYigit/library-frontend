@@ -156,7 +156,6 @@ function AdminBooksPage() {
         <button
           className="login-btn admin-btn"
           onClick={handleAddNewClick}
-          style={{ flex: 'none' }}
         >
           + Add New Book
         </button>
@@ -247,7 +246,7 @@ function AdminBooksPage() {
         </div>
       )}
 
-      <div className="books-container" style={{ marginTop: '20px' }}>
+      <div className="books-container books-container-spaced">
         <h2>Library Inventory</h2>
         {isLoading ? (
           <p>Loading...</p>
@@ -271,8 +270,7 @@ function AdminBooksPage() {
 
                 <div style={{ marginTop: '20px' }}>
                   <button
-                    className="login-btn user-btn"
-                    style={{ width: '100%', padding: '8px' }}
+                    className="login-btn user-btn full-width-button compact-button"
                     onClick={() => handleEditClick(book)}
                   >
                     Update Details

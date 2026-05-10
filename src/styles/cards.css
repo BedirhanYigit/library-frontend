@@ -27,6 +27,11 @@
   max-width: 500px;
 }
 
+.dashboard-container {
+  max-width: 600px;
+  margin: 40px auto;
+}
+
 .login-card h2,
 .dashboard-container h2,
 .books-container h2 {
