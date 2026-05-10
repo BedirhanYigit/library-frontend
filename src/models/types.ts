@@ -1,10 +1,8 @@
-// src/types.ts
-
 export interface Book {
     id: number;
     title: string;
     author: string;
-    genre?: string;       // The '?' means it is optional (might be null)
+    genre?: string;
     isbn: string;
     numOfTotalCopies: number;
     numOfCopiesAvailable: number;
