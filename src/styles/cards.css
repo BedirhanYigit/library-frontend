@@ -1,0 +1,38 @@
+.login-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 80px;
+}
+
+.login-card,
+.dashboard-container,
+.books-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px); /* Gives a slight glassmorphism effect */
+  padding: 40px 50px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.signup-card {
+  max-width: 500px;
+}
+
+.login-card h2,
+.dashboard-container h2,
+.books-container h2 {
+  margin-top: 0;
+  margin-bottom: 30px;
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 1.8rem;
+}
