@@ -1,4 +1,3 @@
-import React from 'react'
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
@@ -19,18 +18,18 @@ function App() {
         </header>
 
         <Routes>
-          <Route path="/" element={<LoginPage/>}/>
-          <Route path="/dashboard" element={<DashboardPage/>}/>
-          <Route path="/signup" element={<SignUpPage/>}/>
-          <Route path="/books" element={<BooksPage/>}/>
-          <Route path="/my-books" element={<MyBooksPage/>}/>
-          <Route path="/my-reservations" element={<MyReservationsPage/>}/>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/books" element={<BooksPage />} />
+          <Route path="/my-books" element={<MyBooksPage />} />
+          <Route path="/my-reservations" element={<MyReservationsPage />} />
 
           {/* Admin Routes */}
-          <Route path="/admin-dashboard" element={<AdminDashboardPage/>}/>
-          <Route path="/admin/books" element={<AdminBooksPage/>}/>
-          <Route path="/admin/users" element={<AdminUsersPage/>}/>
-          <Route path="*" element={<Navigate to="/"/>}/>
+          <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+          <Route path="/admin/books" element={<AdminBooksPage />} />
+          <Route path="/admin/users" element={<AdminUsersPage />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
     </Router>

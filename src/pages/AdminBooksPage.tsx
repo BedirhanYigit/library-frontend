@@ -153,10 +153,7 @@ function AdminBooksPage() {
         <button className="login-btn back-btn" onClick={() => navigate('/admin-dashboard')}>
           Back to Admin Dashboard
         </button>
-        <button
-          className="login-btn admin-btn"
-          onClick={handleAddNewClick}
-        >
+        <button className="login-btn admin-btn" onClick={handleAddNewClick}>
           + Add New Book
         </button>
       </div>
@@ -192,7 +189,7 @@ function AdminBooksPage() {
 
             <div className="input-group">
               <label>Genre</label>
-              <input type="text" name="genre" value={formData.genre} onChange={handleInputChange}/>
+              <input type="text" name="genre" value={formData.genre} onChange={handleInputChange} />
             </div>
 
             <div className="input-group">

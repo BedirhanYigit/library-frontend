@@ -1,4 +1,4 @@
-import type { ChangeEventHandler, HTMLInputTypeAttribute } from "react";
+import type { ChangeEventHandler, HTMLInputTypeAttribute } from 'react'
 
 type TextFieldProps = {
   label: string
@@ -10,18 +10,17 @@ type TextFieldProps = {
   required?: boolean
 }
 
-function TextField
-({
-   label,
-   name,
-   value,
-   onChange,
-   type = 'text',
-   placeholder,
-   required = false,
- }: TextFieldProps) {
+function TextField({
+  label,
+  name,
+  value,
+  onChange,
+  type = 'text',
+  placeholder,
+  required = false,
+}: TextFieldProps) {
   return (
-    <div className={"input-group"}>
+    <div className={'input-group'}>
       <label htmlFor={name}>
         {label}
         {required && ' *'}

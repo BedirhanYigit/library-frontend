@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import type { ChangeEvent, SubmitEvent } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import TextField from "../components/TextField.tsx";
+import TextField from '../components/TextField'
 
 interface SignUpFormData {
   name: string
@@ -10,10 +11,10 @@ interface SignUpFormData {
   address: string
 }
 
-type FormMessage =
-  | { type: 'success'; text: string }
-  | { type: 'error'; text: string }
-  | null
+type FormMessage = {
+  type: 'success' | 'error'
+  text: string
+} | null
 
 const emptySignUpForm: SignUpFormData = {
   name: '',
@@ -41,7 +42,7 @@ function SignUpPage() {
     setMessage({ type: 'error', text })
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
 
     setFormData((prev) => ({
@@ -50,13 +51,13 @@ function SignUpPage() {
     }))
   }
 
-  const handleSignUpSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSignUpSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     setMessage(null)
 
     if (!formData.email.toLowerCase().endsWith('@gmail.com')) {
       setErrorMessage(
-        'Mail addresses other than gmail are not permitted. Please register with your gmail provider.'
+        'Mail addresses other than gmail are not permitted. Please register with your gmail provider.',
       )
       return
     }
@@ -90,7 +91,7 @@ function SignUpPage() {
 
         {showSuccess ? (
           <div className="success-view">
-            <h3 className={"success-title"}>{message.text}</h3>
+            <h3 className={'success-title'}>{message.text}</h3>
 
             <button className="login-btn user-btn" onClick={() => navigate('/')}>
               Go to Login Page
@@ -102,8 +103,8 @@ function SignUpPage() {
 
             {/*Name*/}
             <TextField
-              label={"Full Name"}
-              name={"name"}
+              label="Full Name"
+              name="name"
               value={formData.name}
               onChange={handleInputChange}
               required
@@ -111,20 +112,20 @@ function SignUpPage() {
 
             {/*Email*/}
             <TextField
-              label={"Email Address"}
-              name={"email"}
-              type={"email"}
+              label="Email Address"
+              name="email"
+              type="email"
               value={formData.email}
               onChange={handleInputChange}
-              placeholder={"example@gmail.com"}
+              placeholder={'example@gmail.com'}
               required
             />
 
             {/*Password*/}
             <TextField
-              label={"Password"}
-              name={"password"}
-              type={'password'}
+              label="Password"
+              name="password"
+              type="password"
               value={formData.password}
               onChange={handleInputChange}
               required
@@ -132,9 +133,9 @@ function SignUpPage() {
 
             {/*Phone number*/}
             <TextField
-              label={"Phone Number"}
-              name={"phoneNumber"}
-              type={"tel"}
+              label="Phone Number"
+              name="phoneNumber"
+              type="tel"
               value={formData.phoneNumber}
               onChange={handleInputChange}
               required
@@ -142,7 +143,7 @@ function SignUpPage() {
 
             {/*Address*/}
             <div className="input-group">
-              <label htmlFor={"address"}>Physical Address *</label>
+              <label htmlFor={'address'}>Physical Address *</label>
 
               <textarea
                 id="address"
@@ -169,8 +170,7 @@ function SignUpPage() {
               </button>
             </div>
           </form>
-        )
-        }
+        )}
       </div>
     </div>
   )
