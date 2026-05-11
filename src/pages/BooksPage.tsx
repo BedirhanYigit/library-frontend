@@ -21,7 +21,7 @@ const BooksPage: React.FC = () => {
   const fetchBooks = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('http://localhost:8080/get-all-books')
+      const response = await fetch('http://localhost:8080/books')
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
       // NEW: Tell TS this data matches the Book[] shape

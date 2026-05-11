@@ -39,7 +39,7 @@ function AdminBooksPage() {
   const fetchBooks = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('http://localhost:8080/get-all-books')
+      const response = await fetch('http://localhost:8080/books')
       if (response.ok) {
         // NEW: Tell TS that the parsed JSON is an array of Books
         const data: Book[] = await response.json()
@@ -121,7 +121,7 @@ function AdminBooksPage() {
 
     try {
       if (editingBook) {
-        const response = await fetch(`http://localhost:8080/update-book/${editingBook.id}`, {
+        const response = await fetch(`http://localhost:8080/books/${editingBook.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -134,7 +134,7 @@ function AdminBooksPage() {
           setFormError('Failed to update the book. Check backend logs.')
         }
       } else {
-        const response = await fetch('http://localhost:8080/create-book', {
+        const response = await fetch('http://localhost:8080/books', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
