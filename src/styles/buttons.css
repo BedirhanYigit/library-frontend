@@ -58,3 +58,11 @@
   color: #1e293b;
   border-color: #cbd5e1;
 }
+
+.full-width-button {
+  width: 100%;
+}
+
+.compact-button {
+  padding: 8px;
+}

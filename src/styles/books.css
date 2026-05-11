@@ -70,6 +70,10 @@
   border-left-color: #4f46e5;
 }
 
+.book-card-actions {
+  margin-top: 20px;
+}
+
 .book-title {
   margin: 0 0 12px 0;
   color: #0f172a;

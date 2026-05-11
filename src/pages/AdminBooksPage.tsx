@@ -1,15 +1,25 @@
-import React, { useEffect, useState } from 'react'
+import type { SubmitEvent } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Book } from '../models/types.ts'
+import type { BookRequest } from '../models/request.types'
 
 interface BookFormData {
   title: string
   author: string
   isbn: string
   genre: string
-  numOfTotalCopies: string | number
-  numOfCopiesAvailable: number
+  numOfTotalCopies: string
   coverImageUrl: string
+}
+
+const emptyBookForm: BookFormData = {
+  title: '',
+  author: '',
+  isbn: '',
+  genre: '',
+  numOfTotalCopies: '',
+  coverImageUrl: '',
 }
 
 function AdminBooksPage() {
@@ -24,15 +34,7 @@ function AdminBooksPage() {
   const [formError, setFormError] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
-  const [formData, setFormData] = useState<BookFormData>({
-    title: '',
-    author: '',
-    isbn: '',
-    genre: '',
-    numOfCopiesAvailable: 0,
-    numOfTotalCopies: 0,
-    coverImageUrl: '',
-  })
+  const [formData, setFormData] = useState<BookFormData>(emptyBookForm)
 
   const fetchBooks = async () => {
     setIsLoading(true)
@@ -69,12 +71,12 @@ function AdminBooksPage() {
     setEditingBook(book)
 
     setFormData({
-      title: book.title || '',
-      author: book.author || '',
-      isbn: book.isbn || '',
-      genre: book.genre || '',
-      numOfTotalCopies: book.numOfTotalCopies || '',
-      coverImageUrl: book.coverImageUrl || '',
+      title: book.title,
+      author: book.author,
+      isbn: book.isbn,
+      genre: book.genre ?? '',
+      numOfTotalCopies: String(book.numOfTotalCopies),
+      coverImageUrl: book.coverImageUrl ?? '',
     })
 
     setShowForm(true)
@@ -84,14 +86,7 @@ function AdminBooksPage() {
   const handleAddNewClick = () => {
     setFormError('')
     setEditingBook(null)
-    setFormData({
-      title: '',
-      author: '',
-      isbn: '',
-      genre: '',
-      numOfTotalCopies: '',
-      coverImageUrl: '',
-    })
+    setFormData(emptyBookForm)
     setShowForm(true)
   }
 
@@ -102,14 +97,26 @@ function AdminBooksPage() {
   }
 
   // NEW: Defined the 'e' parameter as a Form Submission Event
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
     setFormError('')
 
-    const payload = {
-      ...formData,
-      numOfTotalCopies: parseInt(formData.numOfTotalCopies as string, 10),
+    const totalCopies = Number(formData.numOfTotalCopies)
+
+    if (!Number.isInteger(totalCopies) || totalCopies < 1) {
+      setFormError('Total number of copies must be at least 1.')
+      setIsSubmitting(false)
+      return
+    }
+
+    const payload: BookRequest = {
+      title: formData.title.trim(),
+      author: formData.author.trim(),
+      isbn: formData.isbn.trim(),
+      genre: formData.genre.trim(),
+      numOfTotalCopies: totalCopies,
+      coverImageUrl: formData.coverImageUrl.trim(),
     }
 
     try {
@@ -122,7 +129,7 @@ function AdminBooksPage() {
 
         if (response.ok) {
           setShowForm(false)
-          fetchBooks()
+          await fetchBooks()
         } else {
           setFormError('Failed to update the book. Check backend logs.')
         }
@@ -135,12 +142,13 @@ function AdminBooksPage() {
 
         if (response.ok) {
           setShowForm(false)
-          fetchBooks()
+          setFormData(emptyBookForm)
+          await fetchBooks()
         } else {
           setFormError('Failed to add the book.')
         }
       }
-    } catch (error) {
+    } catch {
       setFormError('Network error. Is your Spring Boot backend running?')
     } finally {
       setIsSubmitting(false)
@@ -265,7 +273,7 @@ function AdminBooksPage() {
                   <strong>Available:</strong> {book.numOfCopiesAvailable} / {book.numOfTotalCopies}
                 </p>
 
-                <div style={{ marginTop: '20px' }}>
+                <div className="book-card-actions">
                   <button
                     className="login-btn user-btn full-width-button compact-button"
                     onClick={() => handleEditClick(book)}
