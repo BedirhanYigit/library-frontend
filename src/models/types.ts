@@ -6,7 +6,6 @@ export interface Book {
   isbn: string
   numOfTotalCopies: number
   numOfCopiesAvailable: number
-  available: boolean
   coverImageUrl?: string
 }
 
@@ -22,17 +21,19 @@ export interface User {
 export interface Loan {
   id: number
   bookId: number
+
   bookTitle: string
-  userId: number
-  userName: string
-  loanDate: string
-  dueDate: string
-  returnDate: string | null // Can be a string or null if not returned yet
-  returned: boolean
   author?: string
   genre?: string
   isbn?: string
-  book?: Book // In case the backend nests the book object
+
+  userId: number
+  userName: string
+
+  loanDate: string
+  dueDate: string
+  returnDate: string | null
+  returned: boolean
 }
 
 export interface Reservation {

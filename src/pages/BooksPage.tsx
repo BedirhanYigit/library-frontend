@@ -18,13 +18,15 @@ const BooksPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
 
-  const fetchBooks = async () => {
-    setIsLoading(true)
+  const fetchBooks = async (options?: { showLoading?: boolean }) => {
+    if (options?.showLoading) {
+      setIsLoading(true)
+    }
+
     try {
       const response = await fetch('http://localhost:8080/books')
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
-      // NEW: Tell TS this data matches the Book[] shape
       const data: Book[] = await response.json()
       setBooks(data)
       setError(null)
@@ -103,6 +105,10 @@ const BooksPage: React.FC = () => {
     else if (option === 'title-desc') sortedBooks.sort((a, b) => b.title.localeCompare(a.title))
     else if (option === 'author-asc') sortedBooks.sort((a, b) => a.author.localeCompare(b.author))
     setBooks(sortedBooks)
+  }
+
+  const isAvailable = (book: Book) => {
+    return book.numOfCopiesAvailable > 0
   }
 
   return (
@@ -184,12 +190,12 @@ const BooksPage: React.FC = () => {
                   {book.numOfTotalCopies}
                 </p>
 
-                <p className={`book-status status-${book.available ? 'available' : 'loaned'}`}>
-                  {book.available ? 'AVAILABLE' : 'UNAVAILABLE'}
+                <p className={`book-status status-${isAvailable(book) ? 'available' : 'loaned'}`}>
+                  {isAvailable(book) ? 'AVAILABLE' : 'UNAVAILABLE'}
                 </p>
 
                 <div style={{ marginTop: '20px' }}>
-                  {book.available ? (
+                  {isAvailable(book) ? (
                     <button
                       className="login-btn user-btn"
                       style={{ width: '100%', padding: '10px' }}
