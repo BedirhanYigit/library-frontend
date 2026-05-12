@@ -1,31 +1,31 @@
 {
-  "compilerOptions": {
-    // --- IMPORTANT FIXES FOR REACT ---
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
+	"compilerOptions": {
+		// --- IMPORTANT FIXES FOR REACT ---
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
 
-    // Environment Settings
-    "target": "ESNext",
-    "types": [],
+		// Environment Settings
+		"target": "ESNext",
+		"types": [],
 
-    // Other Outputs
-    "sourceMap": true,
-    // "declaration": true,      // Disabled: Cannot be used with "noEmit": true
-    // "declarationMap": true,   // Disabled: Cannot be used with "noEmit": true
+		// Other Outputs
+		"sourceMap": true,
+		// "declaration": true,      // Disabled: Cannot be used with "noEmit": true
+		// "declarationMap": true,   // Disabled: Cannot be used with "noEmit": true
 
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+		// Stricter Typechecking Options
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true,
 
-    // Recommended Options
-    "strict": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true
-  }
+		// Recommended Options
+		"strict": true,
+		"jsx": "react-jsx",
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"noUncheckedSideEffectImports": true,
+		"moduleDetection": "force",
+		"skipLibCheck": true
+	}
 }

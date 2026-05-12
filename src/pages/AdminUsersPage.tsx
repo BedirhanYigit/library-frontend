@@ -3,75 +3,75 @@ import { useNavigate } from 'react-router-dom'
 import type { User } from '../models/types.ts'
 
 const AdminUsersPage: React.FC = () => {
-  const navigate = useNavigate()
+	const navigate = useNavigate()
 
-  // NEW: Added <User[]> to tell TS this array holds User objects
-  const [users, setUsers] = useState<User[]>([])
-  // NEW: Explicitly typed boolean and string/null states
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+	// NEW: Added <User[]> to tell TS this array holds User objects
+	const [users, setUsers] = useState<User[]>([])
+	// NEW: Explicitly typed boolean and string/null states
+	const [isLoading, setIsLoading] = useState<boolean>(true)
+	const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/get-all-users')
+	useEffect(() => {
+		const fetchUsers = async () => {
+			try {
+				const response = await fetch('http://localhost:8080/get-all-users')
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`)
+				}
 
-        // NEW: Tell TS that the parsed JSON matches our User array structure
-        const data: User[] = await response.json()
-        setUsers(data)
-        setError(null)
-      } catch (err) {
-        console.error('Error fetching users:', err)
-        setError('Could not load users. Is your backend running?')
-      } finally {
-        setIsLoading(false)
-      }
-    }
+				// NEW: Tell TS that the parsed JSON matches our User array structure
+				const data: User[] = await response.json()
+				setUsers(data)
+				setError(null)
+			} catch (err) {
+				console.error('Error fetching users:', err)
+				setError('Could not load users. Is your backend running?')
+			} finally {
+				setIsLoading(false)
+			}
+		}
 
-    fetchUsers()
-  }, [])
+		fetchUsers()
+	}, [])
 
-  return (
-    <div className="page-wrapper">
-      <div className="books-header-actions">
-        <button className="login-btn back-btn" onClick={() => navigate('/admin-dashboard')}>
-          Back to Admin Dashboard
-        </button>
-      </div>
+	return (
+		<div className="page-wrapper">
+			<div className="books-header-actions">
+				<button className="login-btn back-btn" onClick={() => navigate('/admin-dashboard')}>
+					Back to Admin Dashboard
+				</button>
+			</div>
 
-      <div className="books-container">
-        <h2>Registered Library Users</h2>
+			<div className="books-container">
+				<h2>Registered Library Users</h2>
 
-        {isLoading && <p>Loading users from database...</p>}
-        {error && <p className="error-message">{error}</p>}
+				{isLoading && <p>Loading users from database...</p>}
+				{error && <p className="error-message">{error}</p>}
 
-        {!isLoading && !error && users.length === 0 && <p>No users found in the system.</p>}
+				{!isLoading && !error && users.length === 0 && <p>No users found in the system.</p>}
 
-        {!isLoading && !error && users.length > 0 && (
-          <div className="books-grid">
-            {users.map((user) => (
-              <div key={user.id} className="book-card">
-                <h3 className="book-title">{user.name}</h3>
-                <p className="book-detail">
-                  <strong>Email:</strong> {user.email}
-                </p>
-                <p className="book-detail">
-                  <strong>Phone:</strong> {user.phoneNumber || 'N/A'}
-                </p>
-                <p className="book-detail">
-                  <strong>Address:</strong> {user.address || 'N/A'}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  )
+				{!isLoading && !error && users.length > 0 && (
+					<div className="books-grid">
+						{users.map((user) => (
+							<div key={user.id} className="book-card">
+								<h3 className="book-title">{user.name}</h3>
+								<p className="book-detail">
+									<strong>Email:</strong> {user.email}
+								</p>
+								<p className="book-detail">
+									<strong>Phone:</strong> {user.phoneNumber || 'N/A'}
+								</p>
+								<p className="book-detail">
+									<strong>Address:</strong> {user.address || 'N/A'}
+								</p>
+							</div>
+						))}
+					</div>
+				)}
+			</div>
+		</div>
+	)
 }
 
 export default AdminUsersPage
