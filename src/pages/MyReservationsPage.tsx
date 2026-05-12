@@ -63,14 +63,16 @@ const MyReservationsPage: React.FC = () => {
 	return (
 		<div className="page-wrapper">
 			{/* HEADER SECTION */}
-			<div className="books-header-actions" style={{ display: 'flex', alignItems: 'center' }}>
-				<div style={{ display: 'flex', gap: '10px' }}>
+			<div className="books-header-actions">
+				<div className="header-button-group">
 					<button className="login-btn back-btn" onClick={() => navigate('/dashboard')}>
 						Back to Dashboard
 					</button>
+
 					<button className="login-btn user-btn" onClick={() => navigate('/books')}>
 						Browse All Books
 					</button>
+
 					<button className="login-btn user-btn" onClick={() => navigate('/my-books')}>
 						My Books
 					</button>
@@ -83,17 +85,7 @@ const MyReservationsPage: React.FC = () => {
 
 				{/* SUCCESS / ERROR ALERTS */}
 				{actionMessage.text && (
-					<div
-						className={actionMessage.type === 'error' ? 'error-message' : 'success-message'}
-						style={{
-							marginBottom: '20px',
-							padding: '15px',
-							borderRadius: '8px',
-							backgroundColor: actionMessage.type === 'success' ? '#dcfce7' : '#fef2f2',
-							color: actionMessage.type === 'success' ? '#166534' : '#ef4444',
-							fontWeight: 'bold',
-						}}
-					>
+					<div className={actionMessage.type === 'error' ? 'error-message' : 'success-message'}>
 						{actionMessage.text}
 					</div>
 				)}
@@ -108,48 +100,30 @@ const MyReservationsPage: React.FC = () => {
 					<div className="books-grid">
 						{reservations.map((item) => (
 							<div key={item.id} className="book-card">
-								{/* BOOK DETAILS - Fixed with Optional Chaining */}
 								<h3 className="book-title">{item.book?.title || item.bookTitle || 'Unknown Title'}</h3>
+
 								<p className="book-detail">
 									<strong>Author:</strong> {item.book?.author || item.author || 'N/A'}
 								</p>
+
 								<p className="book-detail">
 									<strong>Genre:</strong> {item.book?.genre || item.genre || 'N/A'}
 								</p>
+
 								<p className="book-detail">
 									<strong>ISBN:</strong> {item.book?.isbn || item.isbn || 'N/A'}
 								</p>
 
-								{/* RESERVATION DATE */}
 								<p className="book-detail">
 									<strong>Reserved On:</strong> {item.reservationDate || 'N/A'}
 								</p>
 
-								{/* STATUS INDICATOR */}
-								<p
-									className="book-status"
-									style={{
-										color: '#f59e0b',
-										fontWeight: 'bold',
-										marginTop: '10px',
-									}}
-								>
-									WAITING FOR COPY
-								</p>
+								<p className="book-status status-reserved">WAITING FOR COPY</p>
 
 								{/* CANCEL BUTTON */}
-								<div style={{ marginTop: '20px' }}>
+								<div className="book-card-actions">
 									<button
-										className="login-btn back-btn"
-										style={{
-											width: '100%',
-											padding: '10px',
-											backgroundColor: '#64748b',
-											color: 'white',
-											borderColor: '#64748b',
-											fontWeight: 'bold',
-											cursor: 'pointer',
-										}}
+										className="login-btn secondary-action-btn"
 										onClick={() => handleCancelReservation(item.id)}
 									>
 										Cancel Reservation

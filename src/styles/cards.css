@@ -6,6 +6,10 @@
 	padding-bottom: 80px;
 }
 
+.login-section-relative {
+    position: relative;
+}
+
 .login-card,
 .dashboard-container,
 .books-container {

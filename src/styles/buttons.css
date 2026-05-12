@@ -75,6 +75,10 @@
 	padding: 8px;
 }
 
+.signup-nav-button {
+    padding: 8px 20px;
+}
+
 .reservation-nav-btn {
 	background: #8b5cf6;
 	border-color: #8b5cf6;

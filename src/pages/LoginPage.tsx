@@ -43,11 +43,12 @@ const LoginPage: React.FC = () => {
 	}
 
 	return (
-		<main className="login-section" style={{ position: 'relative' }}>
+		<main className="login-section login-section-relative">
 			{/* Top Right Sign-Up Button */}
 			<div className="top-right-action">
-				<span style={{ marginRight: '15px', fontWeight: '600', color: '#475569' }}>New to the library?</span>
-				<button className="login-btn user-btn" style={{ padding: '8px 20px' }} onClick={() => navigate('/signup')}>
+				<span className="top-right-action-text">New to the library?</span>
+
+				<button className="login-btn user-btn signup-nav-button" onClick={() => navigate('/signup')}>
 					Sign Up
 				</button>
 			</div>
