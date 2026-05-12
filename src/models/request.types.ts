@@ -6,3 +6,8 @@ export interface BookRequest {
 	numOfTotalCopies: number
 	coverImageUrl: string
 }
+
+export interface LoginRequest {
+	email: string
+	password: string
+}

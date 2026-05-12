@@ -15,7 +15,7 @@ const DashboardPage: React.FC = () => {
 			<h2>Library Dashboard</h2>
 			<p>Welcome inside! Here you will manage your library.</p>
 
-			<div className="button-group" style={{ marginTop: '30px' }}>
+			<div className="button-group dashboard-button-group">
 				<button className="login-btn user-btn" onClick={() => navigate('/books')}>
 					Books
 				</button>
@@ -24,7 +24,7 @@ const DashboardPage: React.FC = () => {
 				</button>
 			</div>
 
-			<button onClick={handleLogout} className="login-btn back-btn" style={{ marginTop: '40px' }}>
+			<button onClick={handleLogout} className="login-btn back-btn logout-button">
 				Log Out
 			</button>
 		</div>

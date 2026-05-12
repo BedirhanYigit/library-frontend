@@ -7,7 +7,7 @@ const AdminDashboardPage: React.FC = () => {
 	const navigate = useNavigate()
 
 	return (
-		<div className="dashboard-container" style={{ maxWidth: '800px' }}>
+		<div className="dashboard-container admin-dashboard-container">
 			<h2>Admin Control Panel</h2>
 			<p>Welcome, Administrator. What would you like to manage today?</p>
 
@@ -28,7 +28,7 @@ const AdminDashboardPage: React.FC = () => {
 				</div>
 			</div>
 
-			<button onClick={() => navigate('/')} className="login-btn back-btn" style={{ marginTop: '40px' }}>
+			<button onClick={() => navigate('/')} className="login-btn back-btn admin-logout-button">
 				Log Out
 			</button>
 		</div>

@@ -57,9 +57,7 @@ function SignUpPage() {
 		setMessage(null)
 
 		if (!formData.email.toLowerCase().endsWith('@gmail.com')) {
-			setErrorMessage(
-				'Mail addresses other than gmail are not permitted. Please register with your gmail provider.',
-			)
+			setErrorMessage('Mail addresses other than gmail are not permitted. Please register with your gmail provider.')
 			return
 		}
 
@@ -94,13 +92,7 @@ function SignUpPage() {
 						{showError && <div className="error-message">{message.text}</div>}
 
 						{/*Name*/}
-						<TextField
-							label="Full Name"
-							name="name"
-							value={formData.name}
-							onChange={handleInputChange}
-							required
-						/>
+						<TextField label="Full Name" name="name" value={formData.name} onChange={handleInputChange} required />
 
 						{/*Email*/}
 						<TextField

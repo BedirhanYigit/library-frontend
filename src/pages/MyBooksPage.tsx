@@ -35,7 +35,7 @@ const MyBooksPage: React.FC = () => {
 
 			setLoanedItems(activeLoans)
 			setError(null)
-		} catch (err) {
+		} catch {
 			setError('Could not load your books. Is your backend running?')
 		} finally {
 			setIsLoading(false)
@@ -67,19 +67,17 @@ const MyBooksPage: React.FC = () => {
 
 	return (
 		<div className="page-wrapper">
-			<div className="books-header-actions" style={{ display: 'flex', alignItems: 'center' }}>
-				<div style={{ display: 'flex', gap: '10px' }}>
+			<div className="books-header-actions">
+				<div className="header-button-group">
 					<button className="login-btn back-btn" onClick={() => navigate('/dashboard')}>
 						Back to Dashboard
 					</button>
+
 					<button className="login-btn user-btn" onClick={() => navigate('/books')}>
 						Browse All Books
 					</button>
-					<button
-						className="login-btn user-btn"
-						style={{ backgroundColor: '#8b5cf6', borderColor: '#8b5cf6' }}
-						onClick={() => navigate('/my-reservations')}
-					>
+
+					<button className="login-btn user-btn reservation-nav-btn" onClick={() => navigate('/my-reservations')}>
 						My Reservations
 					</button>
 				</div>
@@ -89,17 +87,7 @@ const MyBooksPage: React.FC = () => {
 				<h2>My Loaned Books</h2>
 
 				{actionMessage.text && (
-					<div
-						className={actionMessage.type === 'error' ? 'error-message' : 'success-message'}
-						style={{
-							marginBottom: '20px',
-							padding: '15px',
-							borderRadius: '8px',
-							backgroundColor: actionMessage.type === 'success' ? '#dcfce7' : '#fef2f2',
-							color: actionMessage.type === 'success' ? '#166534' : '#ef4444',
-							fontWeight: 'bold',
-						}}
-					>
+					<div className={actionMessage.type === 'error' ? 'error-message' : 'success-message'}>
 						{actionMessage.text}
 					</div>
 				)}
@@ -133,26 +121,14 @@ const MyBooksPage: React.FC = () => {
 									<strong>Loaned On:</strong> {item.loanDate}
 								</p>
 
-								<p className="book-detail" style={{ color: '#ef4444' }}>
+								<p className="book-detail book-detail-danger">
 									<strong>Due Date:</strong> {item.dueDate}
 								</p>
 
 								<p className="book-status status-loaned">CURRENTLY LOANED</p>
 
-								<div style={{ marginTop: '20px' }}>
-									<button
-										className="login-btn back-btn"
-										style={{
-											width: '100%',
-											padding: '10px',
-											backgroundColor: '#ef4444',
-											color: 'white',
-											borderColor: '#ef4444',
-											fontWeight: 'bold',
-											cursor: 'pointer',
-										}}
-										onClick={() => handleReturnBook(item.bookId)}
-									>
+								<div className="book-card-actions">
+									<button className="login-btn danger-btn" onClick={() => handleReturnBook(item.bookId)}>
 										Return Book
 									</button>
 								</div>

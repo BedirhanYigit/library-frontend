@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { User } from '../models/types.ts'
+import { get } from '../api/http'
 
 const AdminUsersPage: React.FC = () => {
 	const navigate = useNavigate()
@@ -14,14 +15,7 @@ const AdminUsersPage: React.FC = () => {
 	useEffect(() => {
 		const fetchUsers = async () => {
 			try {
-				const response = await fetch('http://localhost:8080/get-all-users')
-
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`)
-				}
-
-				// NEW: Tell TS that the parsed JSON matches our User array structure
-				const data: User[] = await response.json()
+				const data = await get<User[]>('/get-all-users')
 				setUsers(data)
 				setError(null)
 			} catch (err) {

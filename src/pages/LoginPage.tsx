@@ -1,19 +1,12 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LoginForm from '../components/LoginForm.tsx'
-import { post } from '../api/http' // Assuming this is still .jsx or .tsx, both are fine!
+import { post } from '../api/http'
+import type { LoginRequest } from '../models/request.types'
+import type { LoginResponse } from '../models/response.types' // Assuming this is still .jsx or .tsx, both are fine!
 
 // NEW: Define exactly what string values our view state can hold
 type ViewState = 'selection' | 'user-login' | 'admin-login'
-
-interface LoginRequest {
-	email: string
-	password: string
-}
-
-interface LoginResponse {
-	id: number
-}
 
 const LoginPage: React.FC = () => {
 	const [currentView, setCurrentView] = useState<ViewState>('selection')
@@ -54,11 +47,7 @@ const LoginPage: React.FC = () => {
 			{/* Top Right Sign-Up Button */}
 			<div className="top-right-action">
 				<span style={{ marginRight: '15px', fontWeight: '600', color: '#475569' }}>New to the library?</span>
-				<button
-					className="login-btn user-btn"
-					style={{ padding: '8px 20px' }}
-					onClick={() => navigate('/signup')}
-				>
+				<button className="login-btn user-btn" style={{ padding: '8px 20px' }} onClick={() => navigate('/signup')}>
 					Sign Up
 				</button>
 			</div>

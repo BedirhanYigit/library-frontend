@@ -157,24 +157,12 @@ function AdminBooksPage() {
 
 						<div className="input-group">
 							<label>Title *</label>
-							<input
-								type="text"
-								name="title"
-								value={formData.title}
-								onChange={handleInputChange}
-								required
-							/>
+							<input type="text" name="title" value={formData.title} onChange={handleInputChange} required />
 						</div>
 
 						<div className="input-group">
 							<label>Author *</label>
-							<input
-								type="text"
-								name="author"
-								value={formData.author}
-								onChange={handleInputChange}
-								required
-							/>
+							<input type="text" name="author" value={formData.author} onChange={handleInputChange} required />
 						</div>
 
 						<div className="input-group">
@@ -184,13 +172,7 @@ function AdminBooksPage() {
 
 						<div className="input-group">
 							<label>ISBN *</label>
-							<input
-								type="text"
-								name="isbn"
-								value={formData.isbn}
-								onChange={handleInputChange}
-								required
-							/>
+							<input type="text" name="isbn" value={formData.isbn} onChange={handleInputChange} required />
 						</div>
 
 						<div className="input-group">

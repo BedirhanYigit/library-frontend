@@ -102,8 +102,8 @@ const BooksPage: React.FC = () => {
 
 	return (
 		<div className="page-wrapper">
-			<div className="books-header-actions" style={{ display: 'flex', alignItems: 'center' }}>
-				<div style={{ display: 'flex', gap: '10px' }}>
+			<div className="books-header-actions">
+				<div className="header-button-group">
 					<button className="login-btn back-btn" onClick={() => navigate('/dashboard')}>
 						Back to Dashboard
 					</button>
@@ -112,16 +112,12 @@ const BooksPage: React.FC = () => {
 						My Books
 					</button>
 
-					<button
-						className="login-btn user-btn"
-						style={{ backgroundColor: '#8b5cf6', borderColor: '#8b5cf6' }}
-						onClick={() => navigate('/my-reservations')}
-					>
+					<button className="login-btn user-btn reservation-nav-btn" onClick={() => navigate('/my-reservations')}>
 						My Reservations
 					</button>
 				</div>
 
-				<div className="sort-container" style={{ marginLeft: 'auto' }}>
+				<div className="sort-container">
 					<label htmlFor="sort">Sort by: </label>
 					<select
 						id="sort"
@@ -144,17 +140,7 @@ const BooksPage: React.FC = () => {
 				<h2>Library Books</h2>
 
 				{actionMessage.text && (
-					<div
-						className={actionMessage.type === 'error' ? 'error-message' : 'success-message'}
-						style={{
-							marginBottom: '20px',
-							padding: '15px',
-							borderRadius: '8px',
-							backgroundColor: actionMessage.type === 'success' ? '#dcfce7' : '#fef2f2',
-							color: actionMessage.type === 'success' ? '#166534' : '#ef4444',
-							fontWeight: 'bold',
-						}}
-					>
+					<div className={actionMessage.type === 'error' ? 'error-message' : 'success-message'}>
 						{actionMessage.text}
 					</div>
 				)}
@@ -167,46 +153,37 @@ const BooksPage: React.FC = () => {
 						{books.map((book) => (
 							<div key={book.id} className="book-card">
 								<h3 className="book-title">{book.title}</h3>
+
 								<p className="book-detail">
 									<strong>Author:</strong> {book.author}
 								</p>
+
 								<p className="book-detail">
 									<strong>Genre:</strong> {book.genre}
 								</p>
+
 								<p className="book-detail">
 									<strong>ISBN:</strong> {book.isbn}
 								</p>
+
 								<p className="book-detail">
-									<strong>Available Copies:</strong> {book.numOfCopiesAvailable} /{' '}
-									{book.numOfTotalCopies}
+									<strong>Available Copies:</strong> {book.numOfCopiesAvailable} / {book.numOfTotalCopies}
 								</p>
 
 								<p className={`book-status status-${isAvailable(book) ? 'available' : 'loaned'}`}>
 									{isAvailable(book) ? 'AVAILABLE' : 'UNAVAILABLE'}
 								</p>
 
-								<div style={{ marginTop: '20px' }}>
+								<div className="book-card-actions">
 									{isAvailable(book) ? (
 										<button
-											className="login-btn user-btn"
-											style={{ width: '100%', padding: '10px' }}
+											className="login-btn user-btn full-width-button compact-button"
 											onClick={() => handleLoanBook(book.id)}
 										>
 											Loan Book
 										</button>
 									) : (
-										<button
-											className="login-btn"
-											style={{
-												width: '100%',
-												padding: '10px',
-												backgroundColor: '#f59e0b',
-												borderColor: '#f59e0b',
-												color: 'white',
-												fontWeight: 'bold',
-											}}
-											onClick={() => handleReserveBook(book.id)}
-										>
+										<button className="login-btn reserve-btn" onClick={() => handleReserveBook(book.id)}>
 											Reserve Book
 										</button>
 									)}

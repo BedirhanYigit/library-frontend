@@ -63,6 +63,14 @@
 	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
+.admin-dashboard-container {
+	max-width: 800px;
+}
+
+.admin-logout-button {
+	margin-top: 40px;
+}
+
 @media (max-width: 600px) {
 	.top-right-action {
 		top: 10px;
