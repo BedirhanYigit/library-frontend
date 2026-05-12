@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Reservation } from '../models/types'
+import { deleteRequest, get } from '../api/http'
 
 interface ActionMessage {
 	text: string
@@ -25,13 +26,9 @@ const MyReservationsPage: React.FC = () => {
 		}
 
 		setIsLoading(true)
-		try {
-			const response = await fetch(`http://localhost:8080/get-reservations/${userId}`)
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`)
-			}
 
-			const data: Reservation[] = await response.json()
+		try {
+			const data = await get<Reservation[]>(`/get-reservations/${userId}`)
 			setReservations(data)
 			setError(null)
 		} catch (err) {
@@ -46,20 +43,16 @@ const MyReservationsPage: React.FC = () => {
 		fetchReservations()
 	}, [userId])
 
+	// TODO missing backend?, yb
 	const handleCancelReservation = async (reservationId: number) => {
 		setActionMessage({ text: '', type: '' })
-		try {
-			const response = await fetch(`http://localhost:8080/api/reservations/cancel/${reservationId}`, {
-				method: 'DELETE',
-			})
 
-			if (response.ok) {
-				setActionMessage({ text: 'Reservation cancelled successfully!', type: 'success' })
-				fetchReservations()
-			} else {
-				setActionMessage({ text: 'Failed to cancel reservation.', type: 'error' })
-			}
-		} catch (err) {
+		try {
+			await deleteRequest<void>(`/reservations/cancel/${reservationId}`)
+
+			setActionMessage({ text: 'Reservation cancelled successfully!', type: 'success' })
+			await fetchReservations()
+		} catch {
 			setActionMessage({
 				text: 'Network error. Could not connect to the server.',
 				type: 'error',

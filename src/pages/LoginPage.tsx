@@ -1,48 +1,46 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import LoginForm from '../components/LoginForm.tsx' // Assuming this is still .jsx or .tsx, both are fine!
+import LoginForm from '../components/LoginForm.tsx'
+import { post } from '../api/http' // Assuming this is still .jsx or .tsx, both are fine!
 
 // NEW: Define exactly what string values our view state can hold
 type ViewState = 'selection' | 'user-login' | 'admin-login'
 
+interface LoginRequest {
+	email: string
+	password: string
+}
+
+interface LoginResponse {
+	id: number
+}
+
 const LoginPage: React.FC = () => {
-	// NEW: Apply the ViewState type to our state
 	const [currentView, setCurrentView] = useState<ViewState>('selection')
 	const [errorMessage, setErrorMessage] = useState<string>('')
 
 	const navigate = useNavigate()
 
-	// NEW: Specify that email and password must be strings
 	const handleLoginSubmit = async (email: string, password: string) => {
 		setErrorMessage('')
-		const endpoint =
-			currentView === 'user-login' ? 'http://localhost:8080/login' : 'http://localhost:8080/admin-login'
+
+		const endpoint = currentView === 'user-login' ? '/login' : '/admin/login'
+		const payload: LoginRequest = {
+			email,
+			password,
+		}
 
 		try {
-			const response = await fetch(endpoint, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email, password }),
-			})
+			const data = await post<LoginResponse, LoginRequest>(endpoint, payload)
 
-			if (response.ok) {
-				// NEW: Tell TypeScript that our backend responds with at least an 'id'
-				const data: { id: string } = await response.json()
-
-				if (currentView === 'admin-login') {
-					// localStorage always expects strings, so if your ID is a number from backend,
-					// it implicitly gets converted, but we typed it as string above to be safe.
-					localStorage.setItem('userId', data.id.toString())
-					navigate('/admin-dashboard')
-				} else {
-					localStorage.setItem('userId', data.id.toString())
-					navigate('/dashboard')
-				}
+			localStorage.setItem('userId', data.id.toString())
+			if (currentView === 'admin-login') {
+				navigate('/admin-dashboard')
 			} else {
-				setErrorMessage('Invalid email or password.')
+				navigate('/dashboard')
 			}
 		} catch {
-			setErrorMessage('Network error. Make sure your Spring Boot backend is running.')
+			setErrorMessage('Invalid email or password.')
 		}
 	}
 

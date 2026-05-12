@@ -2,6 +2,7 @@ import type { ChangeEvent, SubmitEvent } from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TextField from '../components/TextField'
+import { post } from '../api/http'
 
 interface SignUpFormData {
 	name: string
@@ -65,20 +66,11 @@ function SignUpPage() {
 		setIsSubmitting(true)
 
 		try {
-			const response = await fetch('http://localhost:8080/create-user', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(formData),
-			})
-
-			if (response.ok) {
-				setSuccessMessage('Account created successfully! You may now log in.')
-				setFormData(emptySignUpForm)
-			} else {
-				setErrorMessage('Failed to create account. This email might already be in use.')
-			}
+			await post<void, SignUpFormData>('/create-user', formData)
+			setSuccessMessage('Account created successfully! You may now log in.')
+			setFormData(emptySignUpForm)
 		} catch {
-			setErrorMessage('Network error. Make sure your backend is running.')
+			setErrorMessage('Failed to create account. This email might already be in use.')
 		} finally {
 			setIsSubmitting(false)
 		}
