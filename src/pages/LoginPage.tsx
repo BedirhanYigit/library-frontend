@@ -17,7 +17,7 @@ const LoginPage: React.FC = () => {
 	const handleLoginSubmit = async (email: string, password: string) => {
 		setErrorMessage('')
 
-		const endpoint = currentView === 'user-login' ? '/login' : '/admin/login'
+		const endpoint = currentView === 'user-login' ? '/auth/users/login' : '/auth/admins/login'
 		const payload: LoginRequest = {
 			email,
 			password,

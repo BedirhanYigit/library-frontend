@@ -12,8 +12,7 @@ interface ActionMessage {
 const MyBooksPage: React.FC = () => {
 	const navigate = useNavigate()
 
-	// NEW: Strongly type our states
-	const [loanedItems, setLoanedItems] = useState<Loan[]>([])
+	const [loans, setLoans] = useState<Loan[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
 	const [error, setError] = useState<string | null>(null)
 	const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
@@ -30,10 +29,10 @@ const MyBooksPage: React.FC = () => {
 		setIsLoading(true)
 
 		try {
-			const data = await get<Loan[]>(`/get-loans/${userId}`)
-			const activeLoans = data.filter((item) => !item.returned)
+			const data = await get<Loan[]>(`/loans/${userId}`)
+			const activeLoans = data.filter((item) => !item.isReturned)
 
-			setLoanedItems(activeLoans)
+			setLoans(activeLoans)
 			setError(null)
 		} catch {
 			setError('Could not load your books. Is your backend running?')
@@ -46,7 +45,7 @@ const MyBooksPage: React.FC = () => {
 		fetchMyBooks()
 	}, [userId])
 
-	const handleReturnBook = async (bookId: number) => {
+	const handleReturnLoan = async (loanId: number) => {
 		setActionMessage({ text: '', type: '' })
 
 		if (!userId) {
@@ -55,7 +54,7 @@ const MyBooksPage: React.FC = () => {
 		}
 
 		try {
-			await post<void>(`/return-book/${userId}/${bookId}`)
+			await post<void>(`/loans/${loanId}`)
 			setActionMessage({ text: 'Book returned successfully!', type: 'success' })
 		} catch {
 			setActionMessage({
@@ -95,13 +94,13 @@ const MyBooksPage: React.FC = () => {
 				{isLoading && <p>Loading your books...</p>}
 				{error && <p className="error-message">{error}</p>}
 
-				{!isLoading && !error && loanedItems.length === 0 && (
+				{!isLoading && !error && loans.length === 0 && (
 					<p>You haven't loaned any books yet. Go browse the catalog!</p>
 				)}
 
-				{!isLoading && !error && loanedItems.length > 0 && (
+				{!isLoading && !error && loans.length > 0 && (
 					<div className="books-grid">
-						{loanedItems.map((item) => (
+						{loans.map((item) => (
 							<div key={item.id} className="book-card">
 								<h3 className="book-title">{item.bookTitle}</h3>
 
@@ -128,7 +127,7 @@ const MyBooksPage: React.FC = () => {
 								<p className="book-status status-loaned">CURRENTLY LOANED</p>
 
 								<div className="book-card-actions">
-									<button className="login-btn danger-btn" onClick={() => handleReturnBook(item.bookId)}>
+									<button className="login-btn danger-btn" onClick={() => handleReturnLoan(item.id)}>
 										Return Book
 									</button>
 								</div>

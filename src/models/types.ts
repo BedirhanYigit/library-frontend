@@ -15,7 +15,6 @@ export interface User {
 	email: string
 	phoneNumber?: string
 	address?: string
-	role?: string
 }
 
 export interface Loan {
@@ -33,18 +32,19 @@ export interface Loan {
 	loanDate: string
 	dueDate: string
 	returnDate: string | null
-	returned: boolean
+	isReturned: boolean
 }
 
 export interface Reservation {
 	id: number
 	bookId: number
+
 	bookTitle: string
-	userId: number
-	userName: string
-	reservationDate: string
 	author?: string
 	genre?: string
 	isbn?: string
-	book?: Book
+
+	userId: number
+	userName: string
+	reservationDate: string
 }

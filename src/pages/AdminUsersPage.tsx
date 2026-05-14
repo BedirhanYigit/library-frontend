@@ -15,7 +15,7 @@ const AdminUsersPage: React.FC = () => {
 	useEffect(() => {
 		const fetchUsers = async () => {
 			try {
-				const data = await get<User[]>('/get-all-users')
+				const data = await get<User[]>('/users')
 				setUsers(data)
 				setError(null)
 			} catch (err) {

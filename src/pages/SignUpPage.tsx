@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TextField from '../components/TextField'
 import { post } from '../api/http'
+import type { User } from '../models/types.ts'
+import type { CreateUserRequest } from '../models/request.types.ts'
 
 interface SignUpFormData {
 	name: string
@@ -64,7 +66,8 @@ function SignUpPage() {
 		setIsSubmitting(true)
 
 		try {
-			await post<void, SignUpFormData>('/create-user', formData)
+			const request: CreateUserRequest = { ...formData }
+			await post<User, CreateUserRequest>('/auth/users/register', request)
 			setSuccessMessage('Account created successfully! You may now log in.')
 			setFormData(emptySignUpForm)
 		} catch {

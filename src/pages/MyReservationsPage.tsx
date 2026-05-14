@@ -28,7 +28,7 @@ const MyReservationsPage: React.FC = () => {
 		setIsLoading(true)
 
 		try {
-			const data = await get<Reservation[]>(`/get-reservations/${userId}`)
+			const data = await get<Reservation[]>(`/reservations/${userId}`)
 			setReservations(data)
 			setError(null)
 		} catch (err) {
@@ -48,7 +48,7 @@ const MyReservationsPage: React.FC = () => {
 		setActionMessage({ text: '', type: '' })
 
 		try {
-			await deleteRequest<void>(`/reservations/cancel/${reservationId}`)
+			await deleteRequest<void>(`/reservations/${reservationId}`)
 
 			setActionMessage({ text: 'Reservation cancelled successfully!', type: 'success' })
 			await fetchReservations()

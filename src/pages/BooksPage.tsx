@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { Book } from '../models/types'
+import type { Book, Loan, Reservation } from '../models/types'
 import { get, post } from '../api/http'
+import type { LoanRequest, ReservationRequest } from '../models/request.types.ts'
 
 // NEW: We can define a quick interface for our action messages
 interface ActionMessage {
@@ -49,7 +50,13 @@ const BooksPage: React.FC = () => {
 			})
 
 		try {
-			await post<void>(`/create-loan-userId-bookId/${userId}/${bookId}`)
+			const userIdInt = parseInt(userId)
+			const loanRequest: LoanRequest = {
+				bookId: bookId,
+				userId: userIdInt,
+			}
+
+			await post<Loan, LoanRequest>(`/loans`, loanRequest)
 			setActionMessage({ text: 'Book loaned successfully!', type: 'success' })
 			await fetchBooks()
 		} catch {
@@ -70,7 +77,12 @@ const BooksPage: React.FC = () => {
 			})
 
 		try {
-			await post<void>(`/make-reservation/${userId}/${bookId}`)
+			const userIdInt = parseInt(userId)
+			const request: ReservationRequest = {
+				userId: userIdInt,
+				bookId: bookId,
+			}
+			await post<Reservation, ReservationRequest>(`/reservations`, request)
 
 			setActionMessage({
 				text: 'Book reserved successfully! You will be notified when it is available.',
