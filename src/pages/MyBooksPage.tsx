@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Loan } from '../models/types'
 import { get, post } from '../api/http'
+import { getCurrentUser } from '../auth/authStorage.ts'
 
 // NEW: Define the shape of our action messages (just like we did in BooksPage)
 interface ActionMessage {
@@ -17,16 +18,13 @@ const MyBooksPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null)
 	const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
 
-	const userId = localStorage.getItem('userId')
+	const currentUser = getCurrentUser()
+	const userId = currentUser?.id
 
-	const fetchMyBooks = async () => {
+	const fetchMyBooks = useCallback(async () => {
 		if (!userId) {
-			setError('User ID not found. Please log in again.')
-			setIsLoading(false)
 			return
 		}
-
-		setIsLoading(true)
 
 		try {
 			const data = await get<Loan[]>(`/loans/${userId}`)
@@ -39,11 +37,11 @@ const MyBooksPage: React.FC = () => {
 		} finally {
 			setIsLoading(false)
 		}
-	}
+	}, [userId])
 
 	useEffect(() => {
-		fetchMyBooks()
-	}, [userId])
+		void fetchMyBooks()
+	}, [fetchMyBooks])
 
 	const handleReturnLoan = async (loanId: number) => {
 		setActionMessage({ text: '', type: '' })
@@ -54,8 +52,9 @@ const MyBooksPage: React.FC = () => {
 		}
 
 		try {
-			await post<void>(`/loans/${loanId}`)
+			await post<void>(`/loans/${loanId}/return`)
 			setActionMessage({ text: 'Book returned successfully!', type: 'success' })
+			await fetchMyBooks()
 		} catch {
 			setActionMessage({
 				text: 'Network error. Could not connect to the server.',
@@ -94,9 +93,7 @@ const MyBooksPage: React.FC = () => {
 				{isLoading && <p>Loading your books...</p>}
 				{error && <p className="error-message">{error}</p>}
 
-				{!isLoading && !error && loans.length === 0 && (
-					<p>You haven't loaned any books yet. Go browse the catalog!</p>
-				)}
+				{!isLoading && !error && loans.length === 0 && <p>You haven't loaned any books yet. Go browse the catalog!</p>}
 
 				{!isLoading && !error && loans.length > 0 && (
 					<div className="books-grid">

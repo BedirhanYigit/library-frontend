@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import LoginForm from '../components/LoginForm.tsx'
 import { post } from '../api/http'
 import type { LoginRequest } from '../models/request.types'
-import type { LoginResponse } from '../models/response.types' // Assuming this is still .jsx or .tsx, both are fine!
+import type { LoginResponse } from '../models/response.types'
+import { type CurrentUser, saveCurrentUser, type UserRole } from '../auth/authStorage.ts'
 
 // NEW: Define exactly what string values our view state can hold
 type ViewState = 'selection' | 'user-login' | 'admin-login'
@@ -17,17 +18,24 @@ const LoginPage: React.FC = () => {
 	const handleLoginSubmit = async (email: string, password: string) => {
 		setErrorMessage('')
 
-		const endpoint = currentView === 'user-login' ? '/auth/users/login' : '/auth/admins/login'
+		const isAdminLogin = currentView === 'admin-login'
+		const endpoint = isAdminLogin ? '/auth/admins/login' : '/auth/users/login'
+		const role: UserRole = isAdminLogin ? 'ADMIN' : 'USER'
+
 		const payload: LoginRequest = {
 			email,
 			password,
 		}
 
 		try {
-			const data = await post<LoginResponse, LoginRequest>(endpoint, payload)
+			const data = await post<LoginResponse<CurrentUser>, LoginRequest>(endpoint, payload)
 
-			localStorage.setItem('userId', data.id.toString())
-			if (currentView === 'admin-login') {
+			saveCurrentUser({
+				...data.user,
+				role,
+			})
+
+			if (isAdminLogin) {
 				navigate('/admin-dashboard')
 			} else {
 				navigate('/dashboard')

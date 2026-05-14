@@ -37,14 +37,21 @@ export interface Loan {
 
 export interface Reservation {
 	id: number
-	bookId: number
+	reservationDate: string
 
-	bookTitle: string
+	book: ReservationBook
+	user: ReservationUser
+}
+
+export interface ReservationBook {
+	bookId: number
+	title: string
 	author?: string
 	genre?: string
-	isbn?: string
+	isbn: string
+}
 
+export interface ReservationUser {
 	userId: number
 	userName: string
-	reservationDate: string
 }

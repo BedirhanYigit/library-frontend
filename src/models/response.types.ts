@@ -1,3 +1,5 @@
-export interface LoginResponse {
-	id: number
+export interface LoginResponse<TUser> {
+	token: string
+	tokenType: string
+	user: TUser
 }

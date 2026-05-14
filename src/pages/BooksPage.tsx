@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import type { Book, Loan, Reservation } from '../models/types'
 import { get, post } from '../api/http'
 import type { LoanRequest, ReservationRequest } from '../models/request.types.ts'
+import { getCurrentUser } from '../auth/authStorage.ts'
 
 // NEW: We can define a quick interface for our action messages
 interface ActionMessage {
@@ -42,7 +43,10 @@ const BooksPage: React.FC = () => {
 
 	const handleLoanBook = async (bookId: number) => {
 		setActionMessage({ text: '', type: '' })
-		const userId = localStorage.getItem('userId')
+
+		const currentUser = getCurrentUser()
+		const userId = currentUser?.id
+
 		if (!userId)
 			return setActionMessage({
 				text: 'Error: User ID missing. Please log in.',
@@ -50,10 +54,9 @@ const BooksPage: React.FC = () => {
 			})
 
 		try {
-			const userIdInt = parseInt(userId)
 			const loanRequest: LoanRequest = {
 				bookId: bookId,
-				userId: userIdInt,
+				userId: userId,
 			}
 
 			await post<Loan, LoanRequest>(`/loans`, loanRequest)
@@ -69,7 +72,10 @@ const BooksPage: React.FC = () => {
 
 	const handleReserveBook = async (bookId: number) => {
 		setActionMessage({ text: '', type: '' })
-		const userId = localStorage.getItem('userId')
+
+		const currentUser = getCurrentUser()
+		const userId = currentUser?.id
+
 		if (!userId)
 			return setActionMessage({
 				text: 'Error: User ID missing. Please log in.',
@@ -77,9 +83,8 @@ const BooksPage: React.FC = () => {
 			})
 
 		try {
-			const userIdInt = parseInt(userId)
 			const request: ReservationRequest = {
-				userId: userIdInt,
+				userId: userId,
 				bookId: bookId,
 			}
 			await post<Reservation, ReservationRequest>(`/reservations`, request)

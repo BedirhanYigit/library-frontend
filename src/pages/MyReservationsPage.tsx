@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Reservation } from '../models/types'
 import { deleteRequest, get } from '../api/http'
+import { getCurrentUser } from '../auth/authStorage.ts'
 
 interface ActionMessage {
 	text: string
@@ -16,7 +17,8 @@ const MyReservationsPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null)
 	const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
 
-	const userId = localStorage.getItem('userId')
+	const currentUser = getCurrentUser()
+	const userId = currentUser?.id
 
 	const fetchReservations = async () => {
 		if (!userId) {
@@ -98,24 +100,24 @@ const MyReservationsPage: React.FC = () => {
 				{/* RESERVATIONS GRID */}
 				{!isLoading && !error && reservations.length > 0 && (
 					<div className="books-grid">
-						{reservations.map((item) => (
-							<div key={item.id} className="book-card">
-								<h3 className="book-title">{item.book?.title || item.bookTitle || 'Unknown Title'}</h3>
+						{reservations.map((reservation) => (
+							<div key={reservation.id} className="book-card">
+								<h3 className="book-title">{reservation.book?.title || 'Unknown Title'}</h3>
 
 								<p className="book-detail">
-									<strong>Author:</strong> {item.book?.author || item.author || 'N/A'}
+									<strong>Author:</strong> {reservation.book?.author || 'N/A'}
 								</p>
 
 								<p className="book-detail">
-									<strong>Genre:</strong> {item.book?.genre || item.genre || 'N/A'}
+									<strong>Genre:</strong> {reservation.book?.genre || 'N/A'}
 								</p>
 
 								<p className="book-detail">
-									<strong>ISBN:</strong> {item.book?.isbn || item.isbn || 'N/A'}
+									<strong>ISBN:</strong> {reservation.book?.isbn || 'N/A'}
 								</p>
 
 								<p className="book-detail">
-									<strong>Reserved On:</strong> {item.reservationDate || 'N/A'}
+									<strong>Reserved On:</strong> {reservation.reservationDate || 'N/A'}
 								</p>
 
 								<p className="book-status status-reserved">WAITING FOR COPY</p>
@@ -124,7 +126,7 @@ const MyReservationsPage: React.FC = () => {
 								<div className="book-card-actions">
 									<button
 										className="login-btn secondary-action-btn"
-										onClick={() => handleCancelReservation(item.id)}
+										onClick={() => handleCancelReservation(reservation.id)}
 									>
 										Cancel Reservation
 									</button>
