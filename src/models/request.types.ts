@@ -7,11 +7,6 @@ export interface BookRequest {
 	coverImageUrl: string
 }
 
-export interface LoginRequest {
-	email: string
-	password: string
-}
-
 export interface LoanRequest {
 	bookId: number,
 	userId: number,

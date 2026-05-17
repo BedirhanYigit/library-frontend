@@ -1,3 +1,5 @@
+// TODO simplify or remove these, yb
+
 export type UserRole = 'USER' | 'ADMIN'
 
 export interface CurrentUser {
