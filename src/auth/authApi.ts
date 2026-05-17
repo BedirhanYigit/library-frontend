@@ -10,7 +10,7 @@ export function loginAdmin(request: LoginRequest): Promise<CurrentUser> {
 }
 
 export function getMe(): Promise<CurrentUser> {
-	return get<CurrentUser>('auth/me')
+	return get<CurrentUser>('/auth/me')
 }
 
 export function logout(): Promise<void> {

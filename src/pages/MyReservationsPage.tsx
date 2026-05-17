@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Reservation } from '../models/types'
 import { deleteRequest, get } from '../api/http'
-import { getCurrentUser } from '../auth/authStorage.ts'
+import { useAuth } from '../auth/useAuth.ts'
 
 interface ActionMessage {
 	text: string
@@ -17,33 +17,34 @@ const MyReservationsPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null)
 	const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
 
-	const currentUser = getCurrentUser()
+	const { currentUser, isLoading: isAuthLoading } = useAuth()
 	const userId = currentUser?.id
 
-	const fetchReservations = async () => {
+	const fetchReservations = useCallback(async () => {
+		if (isAuthLoading) {
+			return
+		}
+
 		if (!userId) {
 			setError('User ID not found. Please log in again.')
 			setIsLoading(false)
 			return
 		}
 
-		setIsLoading(true)
-
 		try {
 			const data = await get<Reservation[]>(`/reservations/${userId}`)
 			setReservations(data)
 			setError(null)
-		} catch (err) {
-			console.error('Error fetching reservations:', err)
+		} catch {
 			setError('Could not load your reservations. Is your backend running?')
 		} finally {
 			setIsLoading(false)
 		}
-	}
+	}, [isAuthLoading, userId])
 
 	useEffect(() => {
-		fetchReservations()
-	}, [userId])
+		void fetchReservations()
+	}, [fetchReservations])
 
 	// TODO missing backend?, yb
 	const handleCancelReservation = async (reservationId: number) => {

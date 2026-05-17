@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Loan } from '../models/types'
 import { get, post } from '../api/http'
-import { getCurrentUser } from '../auth/authStorage.ts'
+import { useAuth } from '../auth/useAuth.ts'
 
 // NEW: Define the shape of our action messages (just like we did in BooksPage)
 interface ActionMessage {
@@ -18,11 +18,17 @@ const MyBooksPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null)
 	const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
 
-	const currentUser = getCurrentUser()
+	const { currentUser, isLoading: isAuthLoading } = useAuth()
 	const userId = currentUser?.id
 
 	const fetchMyBooks = useCallback(async () => {
+		if (isAuthLoading) {
+			return
+		}
+
 		if (!userId) {
+			setError('User ID not found. Please log in again.')
+			setIsLoading(false)
 			return
 		}
 
@@ -37,7 +43,7 @@ const MyBooksPage: React.FC = () => {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [userId])
+	}, [isAuthLoading, userId])
 
 	useEffect(() => {
 		void fetchMyBooks()

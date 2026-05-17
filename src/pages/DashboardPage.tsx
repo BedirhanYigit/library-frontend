@@ -1,12 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../auth/useAuth.ts'
 
 // NEW: Added React.FC to type this as a Functional Component
 const DashboardPage: React.FC = () => {
 	const navigate = useNavigate()
+	const [error, setError] = useState<string | null>(null)
 
-	// TypeScript automatically infers that this function returns nothing (void)
-	const handleLogout = () => {
+	const { logout } = useAuth()
+
+	const handleLogout = async () => {
+		try {
+			await logout()
+		} catch {
+			setError('Failed to log out. Please try again.')
+		}
+
 		navigate('/')
 	}
 
@@ -23,6 +32,8 @@ const DashboardPage: React.FC = () => {
 					Reservations
 				</button>
 			</div>
+
+			{error && <p className="error-message">{error}</p>}
 
 			<button onClick={handleLogout} className="login-btn back-btn logout-button">
 				Log Out

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Book, Loan, Reservation } from '../models/types'
 import { get, post } from '../api/http'
 import type { LoanRequest, ReservationRequest } from '../models/request.types.ts'
-import { getCurrentUser } from '../auth/authStorage.ts'
+import { useAuth } from '../auth/useAuth.ts'
 
 // NEW: We can define a quick interface for our action messages
 interface ActionMessage {
@@ -21,84 +21,79 @@ const BooksPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null)
 	const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
 
-	const fetchBooks = async (options?: { showLoading?: boolean }) => {
-		if (options?.showLoading) {
-			setIsLoading(true)
-		}
+	const { currentUser, isLoading: isAuthLoading } = useAuth()
+	const userId = currentUser?.id
 
-		try {
-			const data = await get<Book[]>('/books')
-			setBooks(data)
-			setError(null)
-		} catch {
-			setError('Could not load books. Is your backend running?')
-		} finally {
-			setIsLoading(false)
-		}
-	}
+	const fetchBooks = useCallback(
+		async (options?: { showLoading?: boolean }) => {
+			if (isAuthLoading) {
+				return
+			}
+
+			if (options?.showLoading) {
+				setIsLoading(true)
+			}
+
+			try {
+				const data = await get<Book[]>('/books')
+				setBooks(data)
+				setError(null)
+			} catch {
+				setError('Could not load books. Is your backend running?')
+			} finally {
+				setIsLoading(false)
+			}
+		},
+		[isAuthLoading],
+	)
 
 	useEffect(() => {
 		void fetchBooks()
-	}, [])
+	}, [fetchBooks])
 
 	const handleLoanBook = async (bookId: number) => {
-		setActionMessage({ text: '', type: '' })
+		clearActionMessage()
 
-		const currentUser = getCurrentUser()
-		const userId = currentUser?.id
-
-		if (!userId)
-			return setActionMessage({
-				text: 'Error: User ID missing. Please log in.',
-				type: 'error',
-			})
+		if (!userId) {
+			setErrorMessage('Error: User ID missing. Please log in.')
+			return
+		}
 
 		try {
-			const loanRequest: LoanRequest = {
-				bookId: bookId,
-				userId: userId,
-			}
-
-			await post<Loan, LoanRequest>(`/loans`, loanRequest)
+			await post<Loan, LoanRequest>(`/loans`, { bookId: bookId, userId: userId })
 			setActionMessage({ text: 'Book loaned successfully!', type: 'success' })
 			await fetchBooks()
 		} catch {
-			setActionMessage({
-				text: 'Failed to loan book. You may have reached your limit.',
-				type: 'error',
-			})
+			setErrorMessage('Failed to loan book. You may have reached your limit.')
 		}
 	}
 
 	const handleReserveBook = async (bookId: number) => {
 		setActionMessage({ text: '', type: '' })
 
-		const currentUser = getCurrentUser()
-		const userId = currentUser?.id
-
-		if (!userId)
-			return setActionMessage({
-				text: 'Error: User ID missing. Please log in.',
-				type: 'error',
-			})
+		if (!userId) {
+			setErrorMessage('Error: User ID missing. Please log in.')
+			return
+		}
 
 		try {
-			const request: ReservationRequest = {
-				userId: userId,
-				bookId: bookId,
-			}
-			await post<Reservation, ReservationRequest>(`/reservations`, request)
-
-			setActionMessage({
-				text: 'Book reserved successfully! You will be notified when it is available.',
-				type: 'success',
-			})
+			await post<Reservation, ReservationRequest>(`/reservations`, { userId: userId, bookId: bookId })
+			setSuccess('Book reserved successfully! You will be notified when it is available.')
 		} catch {
-			setActionMessage({
-				text: 'Failed to reserve book. You might already have a reservation for this.',
-				type: 'error',
-			})
+			setErrorMessage('Failed to reserve book. You might already have a reservation for this.')
 		}
+	}
+
+	const setSuccess = (message: string) => {
+		setActionMessage({ type: 'success', text: message })
+	}
+
+	const setErrorMessage = (message: string) => {
+		setActionMessage({ type: 'error', text: message })
+	}
+
+	const clearActionMessage = () => {
+		setActionMessage({ text: '', type: '' })
 	}
 
 	// NEW: Type the 'e' parameter as a Select Element Change Event
