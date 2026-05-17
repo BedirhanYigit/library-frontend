@@ -9,6 +9,7 @@ import SignUpPage from './pages/SignUpPage'
 import MyBooksPage from './pages/MyBooksPage'
 import MyReservationsPage from './pages/MyReservationsPage'
 import { AuthProvider } from './auth/AuthContext'
+import { ProtectedRoute } from './auth/ProtectedRoute.tsx'
 
 function App() {
 	return (
@@ -21,15 +22,72 @@ function App() {
 
 					<Routes>
 						<Route path="/" element={<LoginPage />} />
-						<Route path="/dashboard" element={<DashboardPage />} />
 						<Route path="/signup" element={<SignUpPage />} />
-						<Route path="/books" element={<BooksPage />} />
-						<Route path="/my-books" element={<MyBooksPage />} />
-						<Route path="/my-reservations" element={<MyReservationsPage />} />
 
-						<Route path="/admin-dashboard" element={<AdminDashboardPage />} />
-						<Route path="/admin/books" element={<AdminBooksPage />} />
-						<Route path="/admin/users" element={<AdminUsersPage />} />
+						<Route
+							path="/dashboard"
+							element={
+								<ProtectedRoute>
+									<DashboardPage />
+								</ProtectedRoute>
+							}
+						/>
+
+						<Route
+							path="/books"
+							element={
+								<ProtectedRoute>
+									<BooksPage />
+								</ProtectedRoute>
+							}
+						/>
+
+						<Route
+							path="/my-books"
+							element={
+								<ProtectedRoute>
+									<MyBooksPage />
+								</ProtectedRoute>
+							}
+						/>
+
+						<Route
+							path="/my-reservations"
+							element={
+								<ProtectedRoute>
+									<MyReservationsPage />
+								</ProtectedRoute>
+							}
+						/>
+
+						{/*Admin Pages*/}
+						<Route
+							path="/admin-dashboard"
+							element={
+								<ProtectedRoute requireAdmin>
+									<AdminDashboardPage />
+								</ProtectedRoute>
+							}
+						/>
+
+						<Route
+							path="/admin/books"
+							element={
+								<ProtectedRoute requireAdmin>
+									<AdminBooksPage />
+								</ProtectedRoute>
+							}
+						/>
+
+						<Route
+							path="/admin/users"
+							element={
+								<ProtectedRoute requireAdmin>
+									<AdminUsersPage />
+								</ProtectedRoute>
+							}
+						/>
+
 						<Route path="*" element={<Navigate to="/" />} />
 					</Routes>
 				</div>
