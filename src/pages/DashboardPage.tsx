@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth.ts'
 
-// NEW: Added React.FC to type this as a Functional Component
 const DashboardPage: React.FC = () => {
 	const navigate = useNavigate()
 	const [error, setError] = useState<string | null>(null)
@@ -28,6 +27,7 @@ const DashboardPage: React.FC = () => {
 				<button className="login-btn user-btn" onClick={() => navigate('/books')}>
 					Books
 				</button>
+
 				<button className="login-btn user-btn" onClick={() => navigate('/my-reservations')}>
 					Reservations
 				</button>

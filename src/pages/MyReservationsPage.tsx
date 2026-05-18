@@ -3,19 +3,16 @@ import { useNavigate } from 'react-router-dom'
 import type { Reservation } from '../models/types'
 import { deleteRequest, get } from '../api/http'
 import { useAuth } from '../auth/useAuth.ts'
-
-interface ActionMessage {
-	text: string
-	type: 'success' | 'error' | ''
-}
+import type { StatusMessageType } from '../components/StatusMessage.tsx'
+import StatusMessage from '../components/StatusMessage.tsx'
 
 const MyReservationsPage: React.FC = () => {
 	const navigate = useNavigate()
 
 	const [reservations, setReservations] = useState<Reservation[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
-	const [error, setError] = useState<string | null>(null)
-	const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
+	const [loadError, setLoadError] = useState<string | null>(null)
+	const [actionMessage, setActionMessage] = useState<StatusMessageType>(null)
 
 	const { currentUser, isLoading: isAuthLoading } = useAuth()
 	const userId = currentUser?.id
@@ -26,7 +23,7 @@ const MyReservationsPage: React.FC = () => {
 		}
 
 		if (!userId) {
-			setError('User ID not found. Please log in again.')
+			setLoadError('User ID not found. Please log in again.')
 			setIsLoading(false)
 			return
 		}
@@ -34,9 +31,9 @@ const MyReservationsPage: React.FC = () => {
 		try {
 			const data = await get<Reservation[]>(`/reservations/${userId}`)
 			setReservations(data)
-			setError(null)
+			setLoadError(null)
 		} catch {
-			setError('Could not load your reservations. Is your backend running?')
+			setLoadError('Could not load your reservations. Is your backend running?')
 		} finally {
 			setIsLoading(false)
 		}
@@ -46,26 +43,32 @@ const MyReservationsPage: React.FC = () => {
 		void fetchReservations()
 	}, [fetchReservations])
 
-	// TODO missing backend?, yb
+	const setSuccessMessage = (message: string) => {
+		setActionMessage({ type: 'success', text: message })
+	}
+
+	const setErrorMessage = (message: string) => {
+		setActionMessage({ type: 'error', text: message })
+	}
+
+	const clearActionMessage = () => {
+		setActionMessage(null)
+	}
+
 	const handleCancelReservation = async (reservationId: number) => {
-		setActionMessage({ text: '', type: '' })
+		clearActionMessage()
 
 		try {
 			await deleteRequest<void>(`/reservations/${reservationId}`)
-
-			setActionMessage({ text: 'Reservation cancelled successfully!', type: 'success' })
+			setSuccessMessage('Reservation cancelled successfully!')
 			await fetchReservations()
 		} catch {
-			setActionMessage({
-				text: 'Network error. Could not connect to the server.',
-				type: 'error',
-			})
+			setErrorMessage('Network error. Could not connect to the server.')
 		}
 	}
 
 	return (
 		<div className="page-wrapper">
-			{/* HEADER SECTION */}
 			<div className="page-header-actions">
 				<div className="header-button-group">
 					<button className="login-btn back-btn" onClick={() => navigate('/dashboard')}>
@@ -82,24 +85,17 @@ const MyReservationsPage: React.FC = () => {
 				</div>
 			</div>
 
-			{/* MAIN CONTENT SECTION */}
 			<div className="books-container">
 				<h2>My Reservations</h2>
 
-				{/* SUCCESS / ERROR ALERTS */}
-				{actionMessage.text && (
-					<div className={actionMessage.type === 'error' ? 'error-message' : 'success-message'}>
-						{actionMessage.text}
-					</div>
-				)}
+				<StatusMessage message={actionMessage} />
 
 				{isLoading && <p>Loading your reservations...</p>}
-				{error && <p className="error-message">{error}</p>}
+				{loadError && <p className="error-message">{loadError}</p>}
 
-				{!isLoading && !error && reservations.length === 0 && <p>You have no active reservations.</p>}
+				{!isLoading && !loadError && reservations.length === 0 && <p>You have no active reservations.</p>}
 
-				{/* RESERVATIONS GRID */}
-				{!isLoading && !error && reservations.length > 0 && (
+				{!isLoading && !loadError && reservations.length > 0 && (
 					<div className="entity-grid">
 						{reservations.map((reservation) => (
 							<div key={reservation.id} className="entity-card">
@@ -123,7 +119,6 @@ const MyReservationsPage: React.FC = () => {
 
 								<p className="book-status status-reserved">WAITING FOR COPY</p>
 
-								{/* CANCEL BUTTON */}
 								<div className="entity-card-actions">
 									<button
 										className="login-btn secondary-action-btn"

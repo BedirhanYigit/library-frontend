@@ -51,6 +51,7 @@ const LoginPage: React.FC = () => {
 							<button className="login-btn user-btn" onClick={() => setCurrentView('user-login')}>
 								User Login
 							</button>
+
 							<button className="login-btn admin-btn" onClick={() => setCurrentView('admin-login')}>
 								Admin Login
 							</button>
