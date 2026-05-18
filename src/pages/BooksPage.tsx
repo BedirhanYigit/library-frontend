@@ -4,22 +4,17 @@ import type { Book, Loan, Reservation } from '../models/types'
 import { get, post } from '../api/http'
 import type { LoanRequest, ReservationRequest } from '../models/request.types.ts'
 import { useAuth } from '../auth/useAuth.ts'
-
-// NEW: We can define a quick interface for our action messages
-interface ActionMessage {
-	text: string
-	type: 'success' | 'error' | '' // Strict typing so it only accepts these exact strings
-}
+import type { StatusMessageType } from '../components/StatusMessage.tsx'
+import StatusMessage from '../components/StatusMessage.tsx'
 
 const BooksPage: React.FC = () => {
 	const navigate = useNavigate()
 
-	// NEW: State typing
 	const [books, setBooks] = useState<Book[]>([])
 	const [sortOption, setSortOption] = useState<string>('')
 	const [isLoading, setIsLoading] = useState<boolean>(true)
-	const [error, setError] = useState<string | null>(null)
-	const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
+	const [loadError, setLoadError] = useState<string | null>(null)
+	const [actionMessage, setActionMessage] = useState<StatusMessageType>(null)
 
 	const { currentUser, isLoading: isAuthLoading } = useAuth()
 	const userId = currentUser?.id
@@ -37,9 +32,9 @@ const BooksPage: React.FC = () => {
 			try {
 				const data = await get<Book[]>('/books')
 				setBooks(data)
-				setError(null)
+				setLoadError(null)
 			} catch {
-				setError('Could not load books. Is your backend running?')
+				setLoadError('Could not load books. Is your backend running?')
 			} finally {
 				setIsLoading(false)
 			}
@@ -51,6 +46,18 @@ const BooksPage: React.FC = () => {
 		void fetchBooks()
 	}, [fetchBooks])
 
+	const setSuccessMessage = (message: string) => {
+		setActionMessage({ type: 'success', text: message })
+	}
+
+	const setErrorMessage = (message: string) => {
+		setActionMessage({ type: 'error', text: message })
+	}
+
+	const clearActionMessage = () => {
+		setActionMessage(null)
+	}
+
 	const handleLoanBook = async (bookId: number) => {
 		clearActionMessage()
 
@@ -60,8 +67,8 @@ const BooksPage: React.FC = () => {
 		}
 
 		try {
-			await post<Loan, LoanRequest>(`/loans`, { bookId: bookId, userId: userId })
-			setActionMessage({ text: 'Book loaned successfully!', type: 'success' })
+			await post<Loan, LoanRequest>('/loans', { bookId, userId })
+			setSuccessMessage('Book loaned successfully!')
 			await fetchBooks()
 		} catch {
 			setErrorMessage('Failed to loan book. You may have reached your limit.')
@@ -69,7 +76,7 @@ const BooksPage: React.FC = () => {
 	}
 
 	const handleReserveBook = async (bookId: number) => {
-		setActionMessage({ text: '', type: '' })
+		clearActionMessage()
 
 		if (!userId) {
 			setErrorMessage('Error: User ID missing. Please log in.')
@@ -77,34 +84,27 @@ const BooksPage: React.FC = () => {
 		}
 
 		try {
-			await post<Reservation, ReservationRequest>(`/reservations`, { userId: userId, bookId: bookId })
-			setSuccess('Book reserved successfully! You will be notified when it is available.')
+			await post<Reservation, ReservationRequest>('/reservations', { userId, bookId })
+			setSuccessMessage('Book reserved successfully! You will be notified when it is available.')
 		} catch {
 			setErrorMessage('Failed to reserve book. You might already have a reservation for this.')
 		}
 	}
 
-	const setSuccess = (message: string) => {
-		setActionMessage({ type: 'success', text: message })
-	}
-
-	const setErrorMessage = (message: string) => {
-		setActionMessage({ type: 'error', text: message })
-	}
-
-	const clearActionMessage = () => {
-		setActionMessage({ text: '', type: '' })
-	}
-
-	// NEW: Type the 'e' parameter as a Select Element Change Event
 	const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const option = e.target.value
 		setSortOption(option)
 
 		const sortedBooks = [...books]
-		if (option === 'title-asc') sortedBooks.sort((a, b) => a.title.localeCompare(b.title))
-		else if (option === 'title-desc') sortedBooks.sort((a, b) => b.title.localeCompare(a.title))
-		else if (option === 'author-asc') sortedBooks.sort((a, b) => a.author.localeCompare(b.author))
+
+		if (option === 'title-asc') {
+			sortedBooks.sort((a, b) => a.title.localeCompare(b.title))
+		} else if (option === 'title-desc') {
+			sortedBooks.sort((a, b) => b.title.localeCompare(a.title))
+		} else if (option === 'author-asc') {
+			sortedBooks.sort((a, b) => a.author.localeCompare(b.author))
+		}
+
 		setBooks(sortedBooks)
 	}
 
@@ -114,7 +114,7 @@ const BooksPage: React.FC = () => {
 
 	return (
 		<div className="page-wrapper">
-			<div className="books-header-actions">
+			<div className="page-header-actions">
 				<div className="header-button-group">
 					<button className="login-btn back-btn" onClick={() => navigate('/dashboard')}>
 						Back to Dashboard
@@ -136,7 +136,7 @@ const BooksPage: React.FC = () => {
 						className="sort-select"
 						value={sortOption}
 						onChange={handleSortChange}
-						disabled={isLoading || error !== null}
+						disabled={isLoading || loadError !== null}
 					>
 						<option value="" disabled>
 							Select option...
@@ -151,34 +151,32 @@ const BooksPage: React.FC = () => {
 			<div className="books-container">
 				<h2>Library Books</h2>
 
-				{actionMessage.text && (
-					<div className={actionMessage.type === 'error' ? 'error-message' : 'success-message'}>
-						{actionMessage.text}
-					</div>
-				)}
+				<StatusMessage message={actionMessage} />
 
 				{isLoading && <p>Loading books from database...</p>}
-				{error && <p className="error-message">{error}</p>}
+				{loadError && <p className="error-message">{loadError}</p>}
 
-				{!isLoading && !error && books.length > 0 && (
-					<div className="books-grid">
+				{!isLoading && !loadError && books.length === 0 && <p>No books found.</p>}
+
+				{!isLoading && !loadError && books.length > 0 && (
+					<div className="entity-grid">
 						{books.map((book) => (
-							<div key={book.id} className="book-card">
-								<h3 className="book-title">{book.title}</h3>
+							<div key={book.id} className="entity-card">
+								<h3 className="entity-card-title">{book.title}</h3>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Author:</strong> {book.author}
 								</p>
 
-								<p className="book-detail">
-									<strong>Genre:</strong> {book.genre}
+								<p className="entity-card-detail">
+									<strong>Genre:</strong> {book.genre || 'N/A'}
 								</p>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>ISBN:</strong> {book.isbn}
 								</p>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Available Copies:</strong> {book.numOfCopiesAvailable} / {book.numOfTotalCopies}
 								</p>
 
@@ -186,7 +184,7 @@ const BooksPage: React.FC = () => {
 									{isAvailable(book) ? 'AVAILABLE' : 'UNAVAILABLE'}
 								</p>
 
-								<div className="book-card-actions">
+								<div className="entity-card-actions">
 									{isAvailable(book) ? (
 										<button
 											className="login-btn user-btn full-width-button compact-button"

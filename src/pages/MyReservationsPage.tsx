@@ -66,7 +66,7 @@ const MyReservationsPage: React.FC = () => {
 	return (
 		<div className="page-wrapper">
 			{/* HEADER SECTION */}
-			<div className="books-header-actions">
+			<div className="page-header-actions">
 				<div className="header-button-group">
 					<button className="login-btn back-btn" onClick={() => navigate('/dashboard')}>
 						Back to Dashboard
@@ -100,31 +100,31 @@ const MyReservationsPage: React.FC = () => {
 
 				{/* RESERVATIONS GRID */}
 				{!isLoading && !error && reservations.length > 0 && (
-					<div className="books-grid">
+					<div className="entity-grid">
 						{reservations.map((reservation) => (
-							<div key={reservation.id} className="book-card">
-								<h3 className="book-title">{reservation.book?.title || 'Unknown Title'}</h3>
+							<div key={reservation.id} className="entity-card">
+								<h3 className="entity-card-title">{reservation.book?.title || 'Unknown Title'}</h3>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Author:</strong> {reservation.book?.author || 'N/A'}
 								</p>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Genre:</strong> {reservation.book?.genre || 'N/A'}
 								</p>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>ISBN:</strong> {reservation.book?.isbn || 'N/A'}
 								</p>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Reserved On:</strong> {reservation.reservationDate || 'N/A'}
 								</p>
 
 								<p className="book-status status-reserved">WAITING FOR COPY</p>
 
 								{/* CANCEL BUTTON */}
-								<div className="book-card-actions">
+								<div className="entity-card-actions">
 									<button
 										className="login-btn secondary-action-btn"
 										onClick={() => handleCancelReservation(reservation.id)}

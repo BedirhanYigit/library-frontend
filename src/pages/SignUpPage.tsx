@@ -5,6 +5,7 @@ import TextField from '../components/TextField'
 import { post } from '../api/http'
 import type { User } from '../models/types.ts'
 import type { CreateUserRequest } from '../models/request.types.ts'
+import TextAreaField from '../components/TextAreaField.tsx'
 
 interface SignUpFormData {
 	name: string
@@ -129,17 +130,13 @@ function SignUpPage() {
 						/>
 
 						{/*Address*/}
-						<div className="input-group">
-							<label htmlFor={'address'}>Physical Address *</label>
-
-							<textarea
-								id="address"
-								name="address"
-								value={formData.address}
-								onChange={handleInputChange}
-								required
-							/>
-						</div>
+						<TextAreaField
+							label="Physical Address"
+							name="address"
+							value={formData.address}
+							onChange={handleInputChange}
+							required
+						/>
 
 						{/*Action buttons*/}
 						<div className="button-group button-group-spaced">

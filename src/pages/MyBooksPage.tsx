@@ -71,7 +71,7 @@ const MyBooksPage: React.FC = () => {
 
 	return (
 		<div className="page-wrapper">
-			<div className="books-header-actions">
+			<div className="page-header-actions">
 				<div className="header-button-group">
 					<button className="login-btn back-btn" onClick={() => navigate('/dashboard')}>
 						Back to Dashboard
@@ -102,34 +102,34 @@ const MyBooksPage: React.FC = () => {
 				{!isLoading && !error && loans.length === 0 && <p>You haven't loaned any books yet. Go browse the catalog!</p>}
 
 				{!isLoading && !error && loans.length > 0 && (
-					<div className="books-grid">
+					<div className="entity-grid">
 						{loans.map((item) => (
-							<div key={item.id} className="book-card">
-								<h3 className="book-title">{item.bookTitle}</h3>
+							<div key={item.id} className="entity-card">
+								<h3 className="entity-card-title">{item.bookTitle}</h3>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Author:</strong> {item.author || 'N/A'}
 								</p>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Genre:</strong> {item.genre || 'N/A'}
 								</p>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>ISBN:</strong> {item.isbn || 'N/A'}
 								</p>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Loaned On:</strong> {item.loanDate}
 								</p>
 
-								<p className="book-detail book-detail-danger">
+								<p className="entity-card-detail entity-card-detail-danger">
 									<strong>Due Date:</strong> {item.dueDate}
 								</p>
 
 								<p className="book-status status-loaned">CURRENTLY LOANED</p>
 
-								<div className="book-card-actions">
+								<div className="entity-card-actions">
 									<button className="login-btn danger-btn" onClick={() => handleReturnLoan(item.id)}>
 										Return Book
 									</button>

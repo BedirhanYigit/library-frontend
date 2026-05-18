@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import type { Book } from '../models/types.ts'
 import type { BookRequest } from '../models/request.types'
 import { get, post, put } from '../api/http'
+import TextField from '../components/TextField.tsx'
 
 interface BookFormData {
 	title: string
@@ -51,7 +52,7 @@ function AdminBooksPage() {
 	}
 
 	useEffect(() => {
-		fetchBooks()
+		void fetchBooks()
 	}, [])
 
 	// NEW: Defined the 'e' parameter as an Input Element Change Event
@@ -139,10 +140,11 @@ function AdminBooksPage() {
 
 	return (
 		<div className="page-wrapper">
-			<div className="books-header-actions">
+			<div className="page-header-actions">
 				<button className="login-btn back-btn" onClick={() => navigate('/admin-dashboard')}>
 					Back to Admin Dashboard
 				</button>
+
 				<button className="login-btn admin-btn" onClick={handleAddNewClick}>
 					+ Add New Book
 				</button>
@@ -155,48 +157,32 @@ function AdminBooksPage() {
 					<form className="login-form" onSubmit={handleSubmit}>
 						{formError && <div className="error-message">{formError}</div>}
 
-						<div className="input-group">
-							<label>Title *</label>
-							<input type="text" name="title" value={formData.title} onChange={handleInputChange} required />
-						</div>
+						<TextField label="Title" name="title" value={formData.title} onChange={handleInputChange} required />
 
-						<div className="input-group">
-							<label>Author *</label>
-							<input type="text" name="author" value={formData.author} onChange={handleInputChange} required />
-						</div>
+						<TextField label="Author" name="author" value={formData.author} onChange={handleInputChange} required />
 
-						<div className="input-group">
-							<label>Genre</label>
-							<input type="text" name="genre" value={formData.genre} onChange={handleInputChange} />
-						</div>
+						<TextField label="Genre" name="genre" value={formData.genre} onChange={handleInputChange} />
 
-						<div className="input-group">
-							<label>ISBN *</label>
-							<input type="text" name="isbn" value={formData.isbn} onChange={handleInputChange} required />
-						</div>
+						<TextField label="ISBN" name="isbn" value={formData.isbn} onChange={handleInputChange} required />
 
-						<div className="input-group">
-							<label>Total Number of Copies *</label>
-							<input
-								type="number"
-								name="numOfTotalCopies"
-								value={formData.numOfTotalCopies}
-								onChange={handleInputChange}
-								min="1"
-								required
-							/>
-						</div>
+						<TextField
+							label="Total Number of Copies"
+							name="numOfTotalCopies"
+							type="number"
+							value={formData.numOfTotalCopies}
+							onChange={handleInputChange}
+							min={1}
+							required
+						/>
 
-						<div className="input-group">
-							<label>Cover Image URL (Optional)</label>
-							<input
-								type="url"
-								name="coverImageUrl"
-								value={formData.coverImageUrl}
-								onChange={handleInputChange}
-								placeholder="https://..."
-							/>
-						</div>
+						<TextField
+							label="Cover Image URL"
+							name="coverImageUrl"
+							type="url"
+							value={formData.coverImageUrl}
+							onChange={handleInputChange}
+							placeholder="https://..."
+						/>
 
 						<div className="button-group">
 							<button
@@ -207,6 +193,7 @@ function AdminBooksPage() {
 							>
 								Cancel
 							</button>
+
 							<button type="submit" className="login-btn admin-btn" disabled={isSubmitting}>
 								{isSubmitting ? 'Saving...' : editingBook ? 'Save Changes' : 'Create Book'}
 							</button>
@@ -220,24 +207,24 @@ function AdminBooksPage() {
 				{isLoading ? (
 					<p>Loading...</p>
 				) : (
-					<div className="books-grid">
+					<div className="entity-grid">
 						{books.map((book) => (
-							<div key={book.id} className="book-card">
-								<h3 className="book-title">{book.title}</h3>
-								<p className="book-detail">
+							<div key={book.id} className="entity-card">
+								<h3 className="entity-card-title">{book.title}</h3>
+								<p className="entity-card-detail">
 									<strong>Author:</strong> {book.author}
 								</p>
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Genre:</strong> {book.genre || 'N/A'}
 								</p>
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>ISBN:</strong> {book.isbn}
 								</p>
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Available:</strong> {book.numOfCopiesAvailable} / {book.numOfTotalCopies}
 								</p>
 
-								<div className="book-card-actions">
+								<div className="entity-card-actions">
 									<button
 										className="login-btn user-btn full-width-button compact-button"
 										onClick={() => handleEditClick(book)}
