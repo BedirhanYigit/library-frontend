@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import type { Book } from '../models/types.ts'
 import type { BookRequest } from '../models/request.types'
 import { get, post, put } from '../api/http'
+import TextField from '../components/TextField.tsx'
+import type { StatusMessageType } from '../components/StatusMessage.tsx'
+import StatusMessage from '../components/StatusMessage.tsx'
 
 interface BookFormData {
 	title: string
@@ -28,11 +31,11 @@ function AdminBooksPage() {
 
 	const [books, setBooks] = useState<Book[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
+	const [loadError, setLoadError] = useState<string | null>(null)
 
 	const [showForm, setShowForm] = useState<boolean>(false)
-
 	const [editingBook, setEditingBook] = useState<Book | null>(null)
-	const [formError, setFormError] = useState<string>('')
+	const [formMessage, setFormMessage] = useState<StatusMessageType>(null)
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
 	const [formData, setFormData] = useState<BookFormData>(emptyBookForm)
@@ -43,29 +46,38 @@ function AdminBooksPage() {
 		try {
 			const data = await get<Book[]>('/books')
 			setBooks(data)
+			setLoadError(null)
 		} catch (err) {
 			console.error('Error fetching books:', err)
+			setLoadError('Could not load books. Is your backend running?')
 		} finally {
 			setIsLoading(false)
 		}
 	}
 
 	useEffect(() => {
-		fetchBooks()
+		void fetchBooks()
 	}, [])
 
-	// NEW: Defined the 'e' parameter as an Input Element Change Event
+	const setFormErrorMessage = (message: string) => {
+		setFormMessage({ type: 'error', text: message })
+	}
+
+	const clearFormMessage = () => {
+		setFormMessage(null)
+	}
+
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
+
 		setFormData((prev) => ({
 			...prev,
 			[name]: value,
 		}))
 	}
 
-	// NEW: Defined the 'book' parameter as a Book
 	const handleEditClick = (book: Book) => {
-		setFormError('')
+		clearFormMessage()
 		setEditingBook(book)
 
 		setFormData({
@@ -82,7 +94,7 @@ function AdminBooksPage() {
 	}
 
 	const handleAddNewClick = () => {
-		setFormError('')
+		clearFormMessage()
 		setEditingBook(null)
 		setFormData(emptyBookForm)
 		setShowForm(true)
@@ -91,19 +103,18 @@ function AdminBooksPage() {
 	const handleCancelForm = () => {
 		setShowForm(false)
 		setEditingBook(null)
-		setFormError('')
+		clearFormMessage()
 	}
 
-	// NEW: Defined the 'e' parameter as a Form Submission Event
 	const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setIsSubmitting(true)
-		setFormError('')
+		clearFormMessage()
 
 		const totalCopies = Number(formData.numOfTotalCopies)
 
 		if (!Number.isInteger(totalCopies) || totalCopies < 1) {
-			setFormError('Total number of copies must be at least 1.')
+			setFormErrorMessage('Total number of copies must be at least 1.')
 			setIsSubmitting(false)
 			return
 		}
@@ -120,18 +131,16 @@ function AdminBooksPage() {
 		try {
 			if (editingBook) {
 				await put<Book, BookRequest>(`/books/${editingBook.id}`, payload)
-
-				setShowForm(false)
-				setFormData(emptyBookForm)
-				await fetchBooks()
 			} else {
 				await post<Book, BookRequest>('/books', payload)
-				setShowForm(false)
-				setFormData(emptyBookForm)
-				await fetchBooks()
 			}
+
+			setShowForm(false)
+			setEditingBook(null)
+			setFormData(emptyBookForm)
+			await fetchBooks()
 		} catch {
-			setFormError(editingBook ? 'Failed to update the book. Check backend logs.' : 'Failed to add the book.')
+			setFormErrorMessage(editingBook ? 'Failed to update the book. Check backend logs.' : 'Failed to add the book.')
 		} finally {
 			setIsSubmitting(false)
 		}
@@ -139,10 +148,11 @@ function AdminBooksPage() {
 
 	return (
 		<div className="page-wrapper">
-			<div className="books-header-actions">
+			<div className="page-header-actions">
 				<button className="login-btn back-btn" onClick={() => navigate('/admin-dashboard')}>
 					Back to Admin Dashboard
 				</button>
+
 				<button className="login-btn admin-btn" onClick={handleAddNewClick}>
 					+ Add New Book
 				</button>
@@ -153,50 +163,34 @@ function AdminBooksPage() {
 					<h2>{editingBook ? 'Update Book Details' : 'Add New Book'}</h2>
 
 					<form className="login-form" onSubmit={handleSubmit}>
-						{formError && <div className="error-message">{formError}</div>}
+						<StatusMessage message={formMessage} />
 
-						<div className="input-group">
-							<label>Title *</label>
-							<input type="text" name="title" value={formData.title} onChange={handleInputChange} required />
-						</div>
+						<TextField label="Title" name="title" value={formData.title} onChange={handleInputChange} required />
 
-						<div className="input-group">
-							<label>Author *</label>
-							<input type="text" name="author" value={formData.author} onChange={handleInputChange} required />
-						</div>
+						<TextField label="Author" name="author" value={formData.author} onChange={handleInputChange} required />
 
-						<div className="input-group">
-							<label>Genre</label>
-							<input type="text" name="genre" value={formData.genre} onChange={handleInputChange} />
-						</div>
+						<TextField label="Genre" name="genre" value={formData.genre} onChange={handleInputChange} />
 
-						<div className="input-group">
-							<label>ISBN *</label>
-							<input type="text" name="isbn" value={formData.isbn} onChange={handleInputChange} required />
-						</div>
+						<TextField label="ISBN" name="isbn" value={formData.isbn} onChange={handleInputChange} required />
 
-						<div className="input-group">
-							<label>Total Number of Copies *</label>
-							<input
-								type="number"
-								name="numOfTotalCopies"
-								value={formData.numOfTotalCopies}
-								onChange={handleInputChange}
-								min="1"
-								required
-							/>
-						</div>
+						<TextField
+							label="Total Number of Copies"
+							name="numOfTotalCopies"
+							type="number"
+							value={formData.numOfTotalCopies}
+							onChange={handleInputChange}
+							min={1}
+							required
+						/>
 
-						<div className="input-group">
-							<label>Cover Image URL (Optional)</label>
-							<input
-								type="url"
-								name="coverImageUrl"
-								value={formData.coverImageUrl}
-								onChange={handleInputChange}
-								placeholder="https://..."
-							/>
-						</div>
+						<TextField
+							label="Cover Image URL"
+							name="coverImageUrl"
+							type="url"
+							value={formData.coverImageUrl}
+							onChange={handleInputChange}
+							placeholder="https://..."
+						/>
 
 						<div className="button-group">
 							<button
@@ -207,6 +201,7 @@ function AdminBooksPage() {
 							>
 								Cancel
 							</button>
+
 							<button type="submit" className="login-btn admin-btn" disabled={isSubmitting}>
 								{isSubmitting ? 'Saving...' : editingBook ? 'Save Changes' : 'Create Book'}
 							</button>
@@ -217,27 +212,35 @@ function AdminBooksPage() {
 
 			<div className="books-container books-container-spaced">
 				<h2>Library Inventory</h2>
-				{isLoading ? (
-					<p>Loading...</p>
-				) : (
-					<div className="books-grid">
+
+				{isLoading && <p>Loading...</p>}
+				{loadError && <p className="error-message">{loadError}</p>}
+
+				{!isLoading && !loadError && books.length === 0 && <p>No books found.</p>}
+
+				{!isLoading && !loadError && books.length > 0 && (
+					<div className="entity-grid">
 						{books.map((book) => (
-							<div key={book.id} className="book-card">
-								<h3 className="book-title">{book.title}</h3>
-								<p className="book-detail">
+							<div key={book.id} className="entity-card">
+								<h3 className="entity-card-title">{book.title}</h3>
+
+								<p className="entity-card-detail">
 									<strong>Author:</strong> {book.author}
 								</p>
-								<p className="book-detail">
+
+								<p className="entity-card-detail">
 									<strong>Genre:</strong> {book.genre || 'N/A'}
 								</p>
-								<p className="book-detail">
+
+								<p className="entity-card-detail">
 									<strong>ISBN:</strong> {book.isbn}
 								</p>
-								<p className="book-detail">
+
+								<p className="entity-card-detail">
 									<strong>Available:</strong> {book.numOfCopiesAvailable} / {book.numOfTotalCopies}
 								</p>
 
-								<div className="book-card-actions">
+								<div className="entity-card-actions">
 									<button
 										className="login-btn user-btn full-width-button compact-button"
 										onClick={() => handleEditClick(book)}

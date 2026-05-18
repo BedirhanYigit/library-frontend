@@ -3,20 +3,16 @@ import { useNavigate } from 'react-router-dom'
 import type { Loan } from '../models/types'
 import { get, post } from '../api/http'
 import { useAuth } from '../auth/useAuth.ts'
-
-// NEW: Define the shape of our action messages (just like we did in BooksPage)
-interface ActionMessage {
-	text: string
-	type: 'success' | 'error' | ''
-}
+import StatusMessage from '../components/StatusMessage.tsx'
+import type { StatusMessageType } from '../components/StatusMessage.tsx'
 
 const MyBooksPage: React.FC = () => {
 	const navigate = useNavigate()
 
 	const [loans, setLoans] = useState<Loan[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
-	const [error, setError] = useState<string | null>(null)
-	const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
+	const [loadError, setLoadError] = useState<string | null>(null)
+	const [actionMessage, setActionMessage] = useState<StatusMessageType>(null)
 
 	const { currentUser, isLoading: isAuthLoading } = useAuth()
 	const userId = currentUser?.id
@@ -27,7 +23,7 @@ const MyBooksPage: React.FC = () => {
 		}
 
 		if (!userId) {
-			setError('User ID not found. Please log in again.')
+			setLoadError('User ID not found. Please log in again.')
 			setIsLoading(false)
 			return
 		}
@@ -37,9 +33,9 @@ const MyBooksPage: React.FC = () => {
 			const activeLoans = data.filter((item) => !item.isReturned)
 
 			setLoans(activeLoans)
-			setError(null)
+			setLoadError(null)
 		} catch {
-			setError('Could not load your books. Is your backend running?')
+			setLoadError('Could not load your books. Is your backend running?')
 		} finally {
 			setIsLoading(false)
 		}
@@ -49,29 +45,38 @@ const MyBooksPage: React.FC = () => {
 		void fetchMyBooks()
 	}, [fetchMyBooks])
 
+	const setSuccessMessage = (message: string) => {
+		setActionMessage({ type: 'success', text: message })
+	}
+
+	const setErrorMessage = (message: string) => {
+		setActionMessage({ type: 'error', text: message })
+	}
+
+	const clearActionMessage = () => {
+		setActionMessage(null)
+	}
+
 	const handleReturnLoan = async (loanId: number) => {
-		setActionMessage({ text: '', type: '' })
+		clearActionMessage()
 
 		if (!userId) {
-			setActionMessage({ text: 'User ID not found. Please log in again.', type: 'error' })
+			setErrorMessage('User ID not found. Please log in again.')
 			return
 		}
 
 		try {
 			await post<void>(`/loans/${loanId}/return`)
-			setActionMessage({ text: 'Book returned successfully!', type: 'success' })
+			setSuccessMessage('Book returned successfully!')
 			await fetchMyBooks()
 		} catch {
-			setActionMessage({
-				text: 'Network error. Could not connect to the server.',
-				type: 'error',
-			})
+			setErrorMessage('Network error. Could not connect to the server.')
 		}
 	}
 
 	return (
 		<div className="page-wrapper">
-			<div className="books-header-actions">
+			<div className="page-header-actions">
 				<div className="header-button-group">
 					<button className="login-btn back-btn" onClick={() => navigate('/dashboard')}>
 						Back to Dashboard
@@ -90,46 +95,44 @@ const MyBooksPage: React.FC = () => {
 			<div className="books-container">
 				<h2>My Loaned Books</h2>
 
-				{actionMessage.text && (
-					<div className={actionMessage.type === 'error' ? 'error-message' : 'success-message'}>
-						{actionMessage.text}
-					</div>
-				)}
+				<StatusMessage message={actionMessage} />
 
 				{isLoading && <p>Loading your books...</p>}
-				{error && <p className="error-message">{error}</p>}
+				{loadError && <p className="error-message">{loadError}</p>}
 
-				{!isLoading && !error && loans.length === 0 && <p>You haven't loaned any books yet. Go browse the catalog!</p>}
+				{!isLoading && !loadError && loans.length === 0 && (
+					<p>You haven't loaned any books yet. Go browse the catalog!</p>
+				)}
 
-				{!isLoading && !error && loans.length > 0 && (
-					<div className="books-grid">
+				{!isLoading && !loadError && loans.length > 0 && (
+					<div className="entity-grid">
 						{loans.map((item) => (
-							<div key={item.id} className="book-card">
-								<h3 className="book-title">{item.bookTitle}</h3>
+							<div key={item.id} className="entity-card">
+								<h3 className="entity-card-title">{item.bookTitle}</h3>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Author:</strong> {item.author || 'N/A'}
 								</p>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Genre:</strong> {item.genre || 'N/A'}
 								</p>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>ISBN:</strong> {item.isbn || 'N/A'}
 								</p>
 
-								<p className="book-detail">
+								<p className="entity-card-detail">
 									<strong>Loaned On:</strong> {item.loanDate}
 								</p>
 
-								<p className="book-detail book-detail-danger">
+								<p className="entity-card-detail entity-card-detail-danger">
 									<strong>Due Date:</strong> {item.dueDate}
 								</p>
 
 								<p className="book-status status-loaned">CURRENTLY LOANED</p>
 
-								<div className="book-card-actions">
+								<div className="entity-card-actions">
 									<button className="login-btn danger-btn" onClick={() => handleReturnLoan(item.id)}>
 										Return Book
 									</button>

@@ -6,32 +6,33 @@ import { get } from '../api/http'
 const AdminUsersPage: React.FC = () => {
 	const navigate = useNavigate()
 
-	// NEW: Added <User[]> to tell TS this array holds User objects
 	const [users, setUsers] = useState<User[]>([])
-	// NEW: Explicitly typed boolean and string/null states
 	const [isLoading, setIsLoading] = useState<boolean>(true)
-	const [error, setError] = useState<string | null>(null)
+	const [loadError, setLoadError] = useState<string | null>(null)
 
 	useEffect(() => {
 		const fetchUsers = async () => {
 			try {
 				const data = await get<User[]>('/users')
 				setUsers(data)
-				setError(null)
+				setLoadError(null)
 			} catch (err) {
 				console.error('Error fetching users:', err)
-				setError('Could not load users. Is your backend running?')
+				setLoadError('Could not load users. Is your backend running?')
 			} finally {
 				setIsLoading(false)
 			}
 		}
 
-		fetchUsers()
+		void fetchUsers()
 	}, [])
+
+	const hasUsers = !isLoading && !loadError && users.length > 0
+	const hasNoUsers = !isLoading && !loadError && users.length === 0
 
 	return (
 		<div className="page-wrapper">
-			<div className="books-header-actions">
+			<div className="page-header-actions">
 				<button className="login-btn back-btn" onClick={() => navigate('/admin-dashboard')}>
 					Back to Admin Dashboard
 				</button>
@@ -41,22 +42,25 @@ const AdminUsersPage: React.FC = () => {
 				<h2>Registered Library Users</h2>
 
 				{isLoading && <p>Loading users from database...</p>}
-				{error && <p className="error-message">{error}</p>}
+				{loadError && <p className="error-message">{loadError}</p>}
 
-				{!isLoading && !error && users.length === 0 && <p>No users found in the system.</p>}
+				{hasNoUsers && <p>No users found in the system.</p>}
 
-				{!isLoading && !error && users.length > 0 && (
-					<div className="books-grid">
+				{hasUsers && (
+					<div className="entity-grid">
 						{users.map((user) => (
-							<div key={user.id} className="book-card">
-								<h3 className="book-title">{user.name}</h3>
-								<p className="book-detail">
+							<div key={user.id} className="entity-card">
+								<h3 className="entity-card-title">{user.name}</h3>
+
+								<p className="entity-card-detail">
 									<strong>Email:</strong> {user.email}
 								</p>
-								<p className="book-detail">
+
+								<p className="entity-card-detail">
 									<strong>Phone:</strong> {user.phoneNumber || 'N/A'}
 								</p>
-								<p className="book-detail">
+
+								<p className="entity-card-detail">
 									<strong>Address:</strong> {user.address || 'N/A'}
 								</p>
 							</div>

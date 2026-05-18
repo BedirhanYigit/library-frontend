@@ -5,6 +5,9 @@ import TextField from '../components/TextField'
 import { post } from '../api/http'
 import type { User } from '../models/types.ts'
 import type { CreateUserRequest } from '../models/request.types.ts'
+import TextAreaField from '../components/TextAreaField.tsx'
+import type { StatusMessageType } from '../components/StatusMessage.tsx'
+import StatusMessage from '../components/StatusMessage.tsx'
 
 interface SignUpFormData {
 	name: string
@@ -13,11 +16,6 @@ interface SignUpFormData {
 	phoneNumber: string
 	address: string
 }
-
-type FormMessage = {
-	type: 'success' | 'error'
-	text: string
-} | null
 
 const emptySignUpForm: SignUpFormData = {
 	name: '',
@@ -31,11 +29,11 @@ function SignUpPage() {
 	const navigate = useNavigate()
 
 	const [formData, setFormData] = useState<SignUpFormData>(emptySignUpForm)
-	const [message, setMessage] = useState<FormMessage>(null)
+	const [message, setMessage] = useState<StatusMessageType>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
-	const showSuccess = message?.type === 'success'
-	const showError = message?.type === 'error'
+	const errorMessage = message?.type === 'error' ? message : null
+	const successMessage = message?.type === 'success' ? message : null
 
 	const setSuccessMessage = (text: string) => {
 		setMessage({ type: 'success', text })
@@ -82,9 +80,9 @@ function SignUpPage() {
 			<div className="login-card signup-card">
 				<h2>Library Registration</h2>
 
-				{showSuccess ? (
+				{successMessage ? (
 					<div className="success-view">
-						<h3 className={'success-title'}>{message.text}</h3>
+						<h3 className="success-title">{successMessage.text}</h3>
 
 						<button className="login-btn user-btn" onClick={() => navigate('/')}>
 							Go to Login Page
@@ -92,23 +90,20 @@ function SignUpPage() {
 					</div>
 				) : (
 					<form className="login-form" onSubmit={handleSignUpSubmit}>
-						{showError && <div className="error-message">{message.text}</div>}
+						<StatusMessage message={errorMessage} />
 
-						{/*Name*/}
 						<TextField label="Full Name" name="name" value={formData.name} onChange={handleInputChange} required />
 
-						{/*Email*/}
 						<TextField
 							label="Email Address"
 							name="email"
 							type="email"
 							value={formData.email}
 							onChange={handleInputChange}
-							placeholder={'example@gmail.com'}
+							placeholder="example@gmail.com"
 							required
 						/>
 
-						{/*Password*/}
 						<TextField
 							label="Password"
 							name="password"
@@ -118,7 +113,6 @@ function SignUpPage() {
 							required
 						/>
 
-						{/*Phone number*/}
 						<TextField
 							label="Phone Number"
 							name="phoneNumber"
@@ -128,20 +122,14 @@ function SignUpPage() {
 							required
 						/>
 
-						{/*Address*/}
-						<div className="input-group">
-							<label htmlFor={'address'}>Physical Address *</label>
+						<TextAreaField
+							label="Physical Address"
+							name="address"
+							value={formData.address}
+							onChange={handleInputChange}
+							required
+						/>
 
-							<textarea
-								id="address"
-								name="address"
-								value={formData.address}
-								onChange={handleInputChange}
-								required
-							/>
-						</div>
-
-						{/*Action buttons*/}
 						<div className="button-group button-group-spaced">
 							<button
 								type="button"
