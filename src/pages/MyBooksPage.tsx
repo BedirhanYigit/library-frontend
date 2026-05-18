@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Loan } from '../models/types'
 import { get, post } from '../api/http'
+import { useAuth } from '../auth/useAuth.ts'
 
 // NEW: Define the shape of our action messages (just like we did in BooksPage)
 interface ActionMessage {
@@ -12,41 +13,43 @@ interface ActionMessage {
 const MyBooksPage: React.FC = () => {
 	const navigate = useNavigate()
 
-	// NEW: Strongly type our states
-	const [loanedItems, setLoanedItems] = useState<Loan[]>([])
+	const [loans, setLoans] = useState<Loan[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
 	const [error, setError] = useState<string | null>(null)
 	const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
 
-	const userId = localStorage.getItem('userId')
+	const { currentUser, isLoading: isAuthLoading } = useAuth()
+	const userId = currentUser?.id
 
-	const fetchMyBooks = async () => {
+	const fetchMyBooks = useCallback(async () => {
+		if (isAuthLoading) {
+			return
+		}
+
 		if (!userId) {
 			setError('User ID not found. Please log in again.')
 			setIsLoading(false)
 			return
 		}
 
-		setIsLoading(true)
-
 		try {
-			const data = await get<Loan[]>(`/get-loans/${userId}`)
-			const activeLoans = data.filter((item) => !item.returned)
+			const data = await get<Loan[]>(`/loans/${userId}`)
+			const activeLoans = data.filter((item) => !item.isReturned)
 
-			setLoanedItems(activeLoans)
+			setLoans(activeLoans)
 			setError(null)
 		} catch {
 			setError('Could not load your books. Is your backend running?')
 		} finally {
 			setIsLoading(false)
 		}
-	}
+	}, [isAuthLoading, userId])
 
 	useEffect(() => {
-		fetchMyBooks()
-	}, [userId])
+		void fetchMyBooks()
+	}, [fetchMyBooks])
 
-	const handleReturnBook = async (bookId: number) => {
+	const handleReturnLoan = async (loanId: number) => {
 		setActionMessage({ text: '', type: '' })
 
 		if (!userId) {
@@ -55,8 +58,9 @@ const MyBooksPage: React.FC = () => {
 		}
 
 		try {
-			await post<void>(`/return-book/${userId}/${bookId}`)
+			await post<void>(`/loans/${loanId}/return`)
 			setActionMessage({ text: 'Book returned successfully!', type: 'success' })
+			await fetchMyBooks()
 		} catch {
 			setActionMessage({
 				text: 'Network error. Could not connect to the server.',
@@ -95,13 +99,11 @@ const MyBooksPage: React.FC = () => {
 				{isLoading && <p>Loading your books...</p>}
 				{error && <p className="error-message">{error}</p>}
 
-				{!isLoading && !error && loanedItems.length === 0 && (
-					<p>You haven't loaned any books yet. Go browse the catalog!</p>
-				)}
+				{!isLoading && !error && loans.length === 0 && <p>You haven't loaned any books yet. Go browse the catalog!</p>}
 
-				{!isLoading && !error && loanedItems.length > 0 && (
+				{!isLoading && !error && loans.length > 0 && (
 					<div className="books-grid">
-						{loanedItems.map((item) => (
+						{loans.map((item) => (
 							<div key={item.id} className="book-card">
 								<h3 className="book-title">{item.bookTitle}</h3>
 
@@ -128,7 +130,7 @@ const MyBooksPage: React.FC = () => {
 								<p className="book-status status-loaned">CURRENTLY LOANED</p>
 
 								<div className="book-card-actions">
-									<button className="login-btn danger-btn" onClick={() => handleReturnBook(item.bookId)}>
+									<button className="login-btn danger-btn" onClick={() => handleReturnLoan(item.id)}>
 										Return Book
 									</button>
 								</div>

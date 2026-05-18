@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Reservation } from '../models/types'
 import { deleteRequest, get } from '../api/http'
+import { useAuth } from '../auth/useAuth.ts'
 
 interface ActionMessage {
 	text: string
@@ -16,39 +17,41 @@ const MyReservationsPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null)
 	const [actionMessage, setActionMessage] = useState<ActionMessage>({ text: '', type: '' })
 
-	const userId = localStorage.getItem('userId')
+	const { currentUser, isLoading: isAuthLoading } = useAuth()
+	const userId = currentUser?.id
 
-	const fetchReservations = async () => {
+	const fetchReservations = useCallback(async () => {
+		if (isAuthLoading) {
+			return
+		}
+
 		if (!userId) {
 			setError('User ID not found. Please log in again.')
 			setIsLoading(false)
 			return
 		}
 
-		setIsLoading(true)
-
 		try {
-			const data = await get<Reservation[]>(`/get-reservations/${userId}`)
+			const data = await get<Reservation[]>(`/reservations/${userId}`)
 			setReservations(data)
 			setError(null)
-		} catch (err) {
-			console.error('Error fetching reservations:', err)
+		} catch {
 			setError('Could not load your reservations. Is your backend running?')
 		} finally {
 			setIsLoading(false)
 		}
-	}
+	}, [isAuthLoading, userId])
 
 	useEffect(() => {
-		fetchReservations()
-	}, [userId])
+		void fetchReservations()
+	}, [fetchReservations])
 
 	// TODO missing backend?, yb
 	const handleCancelReservation = async (reservationId: number) => {
 		setActionMessage({ text: '', type: '' })
 
 		try {
-			await deleteRequest<void>(`/reservations/cancel/${reservationId}`)
+			await deleteRequest<void>(`/reservations/${reservationId}`)
 
 			setActionMessage({ text: 'Reservation cancelled successfully!', type: 'success' })
 			await fetchReservations()
@@ -98,24 +101,24 @@ const MyReservationsPage: React.FC = () => {
 				{/* RESERVATIONS GRID */}
 				{!isLoading && !error && reservations.length > 0 && (
 					<div className="books-grid">
-						{reservations.map((item) => (
-							<div key={item.id} className="book-card">
-								<h3 className="book-title">{item.book?.title || item.bookTitle || 'Unknown Title'}</h3>
+						{reservations.map((reservation) => (
+							<div key={reservation.id} className="book-card">
+								<h3 className="book-title">{reservation.book?.title || 'Unknown Title'}</h3>
 
 								<p className="book-detail">
-									<strong>Author:</strong> {item.book?.author || item.author || 'N/A'}
+									<strong>Author:</strong> {reservation.book?.author || 'N/A'}
 								</p>
 
 								<p className="book-detail">
-									<strong>Genre:</strong> {item.book?.genre || item.genre || 'N/A'}
+									<strong>Genre:</strong> {reservation.book?.genre || 'N/A'}
 								</p>
 
 								<p className="book-detail">
-									<strong>ISBN:</strong> {item.book?.isbn || item.isbn || 'N/A'}
+									<strong>ISBN:</strong> {reservation.book?.isbn || 'N/A'}
 								</p>
 
 								<p className="book-detail">
-									<strong>Reserved On:</strong> {item.reservationDate || 'N/A'}
+									<strong>Reserved On:</strong> {reservation.reservationDate || 'N/A'}
 								</p>
 
 								<p className="book-status status-reserved">WAITING FOR COPY</p>
@@ -124,7 +127,7 @@ const MyReservationsPage: React.FC = () => {
 								<div className="book-card-actions">
 									<button
 										className="login-btn secondary-action-btn"
-										onClick={() => handleCancelReservation(item.id)}
+										onClick={() => handleCancelReservation(reservation.id)}
 									>
 										Cancel Reservation
 									</button>

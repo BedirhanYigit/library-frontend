@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LoginForm from '../components/LoginForm.tsx'
-import { post } from '../api/http'
-import type { LoginRequest } from '../models/request.types'
-import type { LoginResponse } from '../models/response.types' // Assuming this is still .jsx or .tsx, both are fine!
+import { useAuth } from '../auth/useAuth.ts'
 
-// NEW: Define exactly what string values our view state can hold
 type ViewState = 'selection' | 'user-login' | 'admin-login'
 
 const LoginPage: React.FC = () => {
@@ -13,23 +10,17 @@ const LoginPage: React.FC = () => {
 	const [errorMessage, setErrorMessage] = useState<string>('')
 
 	const navigate = useNavigate()
+	const { loginAsUser, loginAsAdmin } = useAuth()
 
 	const handleLoginSubmit = async (email: string, password: string) => {
 		setErrorMessage('')
 
-		const endpoint = currentView === 'user-login' ? '/login' : '/admin/login'
-		const payload: LoginRequest = {
-			email,
-			password,
-		}
-
 		try {
-			const data = await post<LoginResponse, LoginRequest>(endpoint, payload)
-
-			localStorage.setItem('userId', data.id.toString())
 			if (currentView === 'admin-login') {
+				await loginAsAdmin({ email, password })
 				navigate('/admin-dashboard')
 			} else {
+				await loginAsUser({ email, password })
 				navigate('/dashboard')
 			}
 		} catch {
@@ -44,7 +35,6 @@ const LoginPage: React.FC = () => {
 
 	return (
 		<main className="login-section login-section-relative">
-			{/* Top Right Sign-Up Button */}
 			<div className="top-right-action">
 				<span className="top-right-action-text">New to the library?</span>
 

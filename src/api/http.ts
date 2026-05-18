@@ -23,11 +23,25 @@ async function handleResponse<T>(response: Response): Promise<T> {
 		return undefined as T
 	}
 
-	return (await response.json()) as Promise<T>
+	const text = await response.text()
+
+	if (!text) {
+		return undefined as T
+	}
+
+	return JSON.parse(text) as T
+}
+
+function createJsonHeaders(): HeadersInit {
+	return {
+		'Content-Type': 'application/json',
+	}
 }
 
 export async function get<T>(path: string, params?: RequestParams): Promise<T> {
-	const response = await fetch(createUrl(path, params))
+	const response = await fetch(createUrl(path, params), {
+		credentials: 'include',
+	})
 
 	return handleResponse<T>(response)
 }
@@ -35,9 +49,8 @@ export async function get<T>(path: string, params?: RequestParams): Promise<T> {
 export async function post<TResponse, TBody = unknown>(path: string, body?: TBody): Promise<TResponse> {
 	const response = await fetch(createUrl(path), {
 		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
+		credentials: 'include',
+		headers: createJsonHeaders(),
 		body: body ? JSON.stringify(body) : null,
 	})
 
@@ -47,9 +60,8 @@ export async function post<TResponse, TBody = unknown>(path: string, body?: TBod
 export async function put<TResponse, TBody>(path: string, body: TBody): Promise<TResponse> {
 	const response = await fetch(createUrl(path), {
 		method: 'PUT',
-		headers: {
-			'Content-Type': 'application/json',
-		},
+		credentials: 'include',
+		headers: createJsonHeaders(),
 		body: JSON.stringify(body),
 	})
 
@@ -59,6 +71,7 @@ export async function put<TResponse, TBody>(path: string, body: TBody): Promise<
 export async function deleteRequest<T>(path: string): Promise<T> {
 	const response = await fetch(createUrl(path), {
 		method: 'DELETE',
+		credentials: 'include',
 	})
 
 	return handleResponse<T>(response)

@@ -1,10 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../auth/useAuth.ts'
 
-// NEW: We added `: React.FC` to explicitly tell TypeScript
-// that this is a React Function Component.
 const AdminDashboardPage: React.FC = () => {
 	const navigate = useNavigate()
+	const [error, setError] = useState<string | null>(null)
+
+	const { logout } = useAuth()
+
+	const handleLogout = async () => {
+		try {
+			await logout()
+		} catch {
+			setError('Failed to log out. Please try again.')
+		}
+
+		navigate('/')
+	}
 
 	return (
 		<div className="dashboard-container admin-dashboard-container">
@@ -28,7 +40,9 @@ const AdminDashboardPage: React.FC = () => {
 				</div>
 			</div>
 
-			<button onClick={() => navigate('/')} className="login-btn back-btn admin-logout-button">
+			{error && <p className="error-message">{error}</p>}
+
+			<button onClick={handleLogout} className="login-btn back-btn admin-logout-button">
 				Log Out
 			</button>
 		</div>
