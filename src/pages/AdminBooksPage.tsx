@@ -7,6 +7,7 @@ import { get, post, put } from '../api/http'
 import TextField from '../components/TextField.tsx'
 import type { StatusMessageType } from '../components/StatusMessage.tsx'
 import StatusMessage from '../components/StatusMessage.tsx'
+import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 
 interface BookFormData {
 	title: string
@@ -139,8 +140,12 @@ function AdminBooksPage() {
 			setEditingBook(null)
 			setFormData(emptyBookForm)
 			await fetchBooks()
-		} catch {
-			setFormErrorMessage(editingBook ? 'Failed to update the book. Check backend logs.' : 'Failed to add the book.')
+		} catch (error) {
+			const fallbackMessage = editingBook
+				? 'Failed to update the book. Please check the entered values.'
+				: 'Failed to add the book. Please check the entered values.'
+
+			setFormErrorMessage(getApiErrorMessage(error, fallbackMessage))
 		} finally {
 			setIsSubmitting(false)
 		}
