@@ -44,6 +44,8 @@ export const en = {
 		totalCopiesValidation: 'Total number of copies must be at least 1.',
 		updateError: 'Failed to update the book. Please check the entered values.',
 		createError: 'Failed to add the book. Please check the entered values.',
+		createSuccess: 'Book created successfully.',
+		updateSuccess: 'Book updated successfully.',
 		cancel: 'Cancel',
 		saving: 'Saving...',
 		saveChanges: 'Save Changes',

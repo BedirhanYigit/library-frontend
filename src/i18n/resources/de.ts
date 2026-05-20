@@ -44,6 +44,8 @@ export const de = {
 		totalCopiesValidation: 'Die Gesamtanzahl der Exemplare muss mindestens 1 sein.',
 		updateError: 'Das Buch konnte nicht aktualisiert werden. Bitte überprüfen Sie die eingegebenen Werte.',
 		createError: 'Das Buch konnte nicht hinzugefügt werden. Bitte überprüfen Sie die eingegebenen Werte.',
+		createSuccess: 'Buch wurde erfolgreich erstellt.',
+		updateSuccess: 'Buch wurde erfolgreich aktualisiert.',
 		cancel: 'Abbrechen',
 		saving: 'Speichern...',
 		saveChanges: 'Änderungen speichern',

@@ -4,18 +4,17 @@ import { useTranslation } from 'react-i18next'
 import type { Reservation } from '../models/types'
 import { deleteRequest, get } from '../api/http'
 import { useAuth } from '../auth/useAuth.ts'
-import type { StatusMessageType } from '../components/StatusMessage.tsx'
-import StatusMessage from '../components/StatusMessage.tsx'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
+import { formatDate } from '../i18n/dateFormatting.ts'
+import { notify } from '../components/notifications/notify.tsx'
 
 const MyReservationsPage: React.FC = () => {
 	const navigate = useNavigate()
-	const { t } = useTranslation()
+	const { t, i18n } = useTranslation()
 
 	const [reservations, setReservations] = useState<Reservation[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
 	const [loadError, setLoadError] = useState<string | null>(null)
-	const [actionMessage, setActionMessage] = useState<StatusMessageType>(null)
 
 	const { currentUser, isLoading: isAuthLoading } = useAuth()
 	const userId = currentUser?.id
@@ -46,32 +45,18 @@ const MyReservationsPage: React.FC = () => {
 		void fetchReservations()
 	}, [fetchReservations, isAuthLoading])
 
-	const setSuccessMessage = (message: string) => {
-		setActionMessage({ type: 'success', text: message })
-	}
-
-	const setErrorMessage = (message: string) => {
-		setActionMessage({ type: 'error', text: message })
-	}
-
-	const clearActionMessage = () => {
-		setActionMessage(null)
-	}
-
 	const handleCancelReservation = async (reservationId: number) => {
-		clearActionMessage()
-
 		if (!userId) {
-			setErrorMessage(t('myReservations.loginAgainCancel'))
+			notify.error(t('myReservations.loginAgainCancel'))
 			return
 		}
 
 		try {
 			await deleteRequest<void>(`/reservations/${reservationId}`)
-			setSuccessMessage(t('myReservations.cancelSuccess'))
+			notify.success(t('myReservations.cancelSuccess'))
 			await fetchReservations()
 		} catch (error) {
-			setErrorMessage(getApiErrorMessage(error, t, t('myReservations.cancelError')))
+			notify.error(getApiErrorMessage(error, t, t('myReservations.cancelError')))
 		}
 	}
 
@@ -95,8 +80,6 @@ const MyReservationsPage: React.FC = () => {
 
 			<div className="books-container">
 				<h2>{t('myReservations.title')}</h2>
-
-				<StatusMessage message={actionMessage} />
 
 				{isLoading && <p>{t('myReservations.loading')}</p>}
 				{loadError && <p className="error-message">{loadError}</p>}
@@ -125,7 +108,7 @@ const MyReservationsPage: React.FC = () => {
 
 								<p className="entity-card-detail">
 									<strong>{t('myReservations.reservedOn')}:</strong>{' '}
-									{reservation.reservationDate || t('book.notAvailable')}
+									{formatDate(reservation.reservationDate, i18n.language) || t('book.notAvailable')}
 								</p>
 
 								<p className="book-status status-reserved">{t('myReservations.waitingForCopy')}</p>

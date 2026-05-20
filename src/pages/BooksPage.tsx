@@ -5,9 +5,8 @@ import type { Book, Loan, Reservation } from '../models/types'
 import { get, post } from '../api/http'
 import type { LoanRequest, ReservationRequest } from '../models/request.types.ts'
 import { useAuth } from '../auth/useAuth.ts'
-import type { StatusMessageType } from '../components/StatusMessage.tsx'
-import StatusMessage from '../components/StatusMessage.tsx'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
+import { notify } from '../components/notifications/notify.tsx'
 
 const BooksPage: React.FC = () => {
 	const navigate = useNavigate()
@@ -17,7 +16,6 @@ const BooksPage: React.FC = () => {
 	const [sortOption, setSortOption] = useState<string>('')
 	const [isLoading, setIsLoading] = useState<boolean>(true)
 	const [loadError, setLoadError] = useState<string | null>(null)
-	const [actionMessage, setActionMessage] = useState<StatusMessageType>(null)
 
 	const { currentUser, isLoading: isAuthLoading } = useAuth()
 	const userId = currentUser?.id
@@ -49,48 +47,32 @@ const BooksPage: React.FC = () => {
 		void fetchBooks({ showLoading: true })
 	}, [fetchBooks, isAuthLoading])
 
-	const setSuccessMessage = (message: string) => {
-		setActionMessage({ type: 'success', text: message })
-	}
-
-	const setErrorMessage = (message: string) => {
-		setActionMessage({ type: 'error', text: message })
-	}
-
-	const clearActionMessage = () => {
-		setActionMessage(null)
-	}
-
 	const handleLoanBook = async (bookId: number) => {
-		clearActionMessage()
-
 		if (!userId) {
-			setErrorMessage(t('books.loginBeforeLoan'))
+			notify.error(t('books.loginBeforeLoan'))
 			return
 		}
 
 		try {
 			await post<Loan, LoanRequest>('/loans', { bookId, userId })
-			setSuccessMessage(t('books.loanSuccess'))
+			notify.success(t('books.loanSuccess'))
 			await fetchBooks()
 		} catch (error) {
-			setErrorMessage(getApiErrorMessage(error, t, t('books.loanError')))
+			notify.error(getApiErrorMessage(error, t, t('books.loanError')))
 		}
 	}
 
 	const handleReserveBook = async (bookId: number) => {
-		clearActionMessage()
-
 		if (!userId) {
-			setErrorMessage(t('books.loginBeforeReserve'))
+			notify.error(t('books.loginBeforeReserve'))
 			return
 		}
 
 		try {
 			await post<Reservation, ReservationRequest>('/reservations', { userId, bookId })
-			setSuccessMessage(t('books.reserveSuccess'))
+			notify.success(t('books.reserveSuccess'))
 		} catch (error) {
-			setErrorMessage(getApiErrorMessage(error, t, t('books.reserveError')))
+			notify.error(getApiErrorMessage(error, t, t('books.reserveError')))
 		}
 	}
 
@@ -157,8 +139,6 @@ const BooksPage: React.FC = () => {
 
 			<div className="books-container">
 				<h2>{t('books.title')}</h2>
-
-				<StatusMessage message={actionMessage} />
 
 				{isLoading && <p>{t('books.loading')}</p>}
 				{loadError && <p className="error-message">{loadError}</p>}

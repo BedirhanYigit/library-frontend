@@ -1,111 +1,111 @@
 .login-section {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 80px;
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding-bottom: 80px;
 }
 
 .login-section-relative {
-    position: relative;
+	position: relative;
 }
 
 .login-card,
 .dashboard-container,
 .books-container {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px); /* Gives a slight glassmorphism effect */
-    padding: 40px 50px;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(10px); /* Gives a slight glassmorphism effect */
+	padding: 40px 50px;
+	border-radius: 20px;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+	text-align: center;
+	border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .page-header-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 15px 25px;
-    border-radius: 15px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 30px;
+	background: rgba(255, 255, 255, 0.9);
+	padding: 15px 25px;
+	border-radius: 15px;
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
 .page-header-actions .login-btn {
-    flex: none;
+	flex: none;
 }
 
 .header-button-group {
-    display: flex;
-    gap: 10px;
+	display: flex;
+	gap: 10px;
 }
 
 .entity-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 25px;
 }
 
 .entity-card {
-    background: white;
-    border: 1px solid #f1f5f9;
-    border-left: 5px solid #6366f1;
-    border-radius: 12px;
-    padding: 25px;
-    text-align: left;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+	background: white;
+	border: 1px solid #f1f5f9;
+	border-left: 5px solid #6366f1;
+	border-radius: 12px;
+	padding: 25px;
+	text-align: left;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
 }
 
 .entity-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
-    border-left-color: #4f46e5;
+	transform: translateY(-5px);
+	box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+	border-left-color: #4f46e5;
 }
 
 .entity-card-actions {
-    margin-top: 20px;
+	margin-top: 20px;
 }
 
 .entity-card-title {
-    margin: 0 0 12px 0;
-    color: #0f172a;
-    font-size: 1.25rem;
-    font-weight: 700;
+	margin: 0 0 12px 0;
+	color: #0f172a;
+	font-size: 1.25rem;
+	font-weight: 700;
 }
 
 .entity-card-detail {
-    margin: 0 0 8px;
-    color: #64748b;
-    font-size: 0.95rem;
+	margin: 0 0 8px;
+	color: #64748b;
+	font-size: 0.95rem;
 }
 
 .entity-card-detail-danger {
-    color: #ef4444;
+	color: #ef4444;
 }
 
 .login-card {
-    width: 100%;
-    max-width: 420px;
+	width: 100%;
+	max-width: 420px;
 }
 
 .signup-card {
-    max-width: 500px;
+	max-width: 500px;
 }
 
 .dashboard-container {
-    max-width: 600px;
-    margin: 40px auto;
+	max-width: 600px;
+	margin: 40px auto;
 }
 
 .login-card h2,
 .dashboard-container h2,
 .books-container h2 {
-    margin-top: 0;
-    margin-bottom: 30px;
-    color: #1e293b;
-    font-weight: 700;
-    font-size: 1.8rem;
+	margin-top: 0;
+	margin-bottom: 30px;
+	color: #1e293b;
+	font-weight: 700;
+	font-size: 1.8rem;
 }
