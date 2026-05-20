@@ -4,6 +4,8 @@ import { getBookErrorMessage } from './bookErrorMessages.ts'
 import { getGeneralErrorMessage } from './generalErrorMessages.ts'
 import { getAuthErrorMessage } from './authErrorMessages.ts'
 import { getUserErrorMessage } from './userErrorMessages.ts'
+import { getLoanErrorMessage } from './loanErrorMessages.ts'
+import { getReservationErrorMessage } from './reservationErrorMessages.ts'
 
 const defaultFallbackMessage = 'Something went wrong. Please try again later.'
 
@@ -54,6 +56,12 @@ function getDomainErrorMessage(response: ApiErrorResponse): string | null {
 
 		case 'BOOK':
 			return getBookErrorMessage(response.code)
+
+		case 'LOAN':
+			return getLoanErrorMessage(response.code)
+
+		case 'RESERVATION':
+			return getReservationErrorMessage(response.code)
 
 		case 'USER':
 			return getUserErrorMessage(response.code)

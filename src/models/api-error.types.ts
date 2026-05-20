@@ -16,6 +16,8 @@ export interface ApiErrorResponse {
 export enum AuthApiErrorCode {
 	EmailAlreadyExists = 'EMAIL_ALREADY_EXISTS',
 	InvalidCredentials = 'INVALID_CREDENTIALS',
+	AuthenticationRequired = 'AUTHENTICATION_REQUIRED',
+	AdminAccessRequired = 'ADMIN_ACCESS_REQUIRED',
 }
 
 export enum BookApiErrorCode {
@@ -31,7 +33,12 @@ export enum UserApiErrorCode {
 export enum LoanApiErrorCode {
 	NotFound = 'NOT_FOUND',
 	OpenLoanAlreadyExists = 'OPEN_LOAN_ALREADY_EXISTS',
-	LoanAlreadyReturned = 'LOAN_ALREADY_RETURNED',
+	BookNotAvailable = 'BOOK_NOT_AVAILABLE',
+}
+
+export enum ReservationApiErrorCode {
+	NotFound = 'NOT_FOUND',
+	ReservationAlreadyExists = 'RESERVATION_ALREADY_EXISTS',
 }
 
 export enum GeneralApiErrorCode {

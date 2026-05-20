@@ -5,6 +5,7 @@ import { deleteRequest, get } from '../api/http'
 import { useAuth } from '../auth/useAuth.ts'
 import type { StatusMessageType } from '../components/StatusMessage.tsx'
 import StatusMessage from '../components/StatusMessage.tsx'
+import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 
 const MyReservationsPage: React.FC = () => {
 	const navigate = useNavigate()
@@ -18,12 +19,8 @@ const MyReservationsPage: React.FC = () => {
 	const userId = currentUser?.id
 
 	const fetchReservations = useCallback(async () => {
-		if (isAuthLoading) {
-			return
-		}
-
 		if (!userId) {
-			setLoadError('User ID not found. Please log in again.')
+			setLoadError('Please log in again to view your reservations.')
 			setIsLoading(false)
 			return
 		}
@@ -32,16 +29,20 @@ const MyReservationsPage: React.FC = () => {
 			const data = await get<Reservation[]>(`/reservations/${userId}`)
 			setReservations(data)
 			setLoadError(null)
-		} catch {
-			setLoadError('Could not load your reservations. Is your backend running?')
+		} catch (error) {
+			setLoadError(getApiErrorMessage(error, 'Could not load your reservations. Please try again.'))
 		} finally {
 			setIsLoading(false)
 		}
-	}, [isAuthLoading, userId])
+	}, [userId])
 
 	useEffect(() => {
+		if (isAuthLoading) {
+			return
+		}
+
 		void fetchReservations()
-	}, [fetchReservations])
+	}, [fetchReservations, isAuthLoading])
 
 	const setSuccessMessage = (message: string) => {
 		setActionMessage({ type: 'success', text: message })
@@ -58,12 +59,17 @@ const MyReservationsPage: React.FC = () => {
 	const handleCancelReservation = async (reservationId: number) => {
 		clearActionMessage()
 
+		if (!userId) {
+			setErrorMessage('Please log in again before cancelling a reservation.')
+			return
+		}
+
 		try {
 			await deleteRequest<void>(`/reservations/${reservationId}`)
 			setSuccessMessage('Reservation cancelled successfully!')
 			await fetchReservations()
-		} catch {
-			setErrorMessage('Network error. Could not connect to the server.')
+		} catch (error) {
+			setErrorMessage(getApiErrorMessage(error, 'Could not cancel the reservation. Please try again.'))
 		}
 	}
 

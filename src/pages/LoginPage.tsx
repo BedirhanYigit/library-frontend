@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LoginForm from '../components/LoginForm.tsx'
 import { useAuth } from '../auth/useAuth.ts'
+import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 
 type ViewState = 'selection' | 'user-login' | 'admin-login'
 
@@ -23,8 +24,8 @@ const LoginPage: React.FC = () => {
 				await loginAsUser({ email, password })
 				navigate('/dashboard')
 			}
-		} catch {
-			setErrorMessage('Invalid email or password.')
+		} catch (error) {
+			setErrorMessage(getApiErrorMessage(error, 'Invalid email or password.'))
 		}
 	}
 

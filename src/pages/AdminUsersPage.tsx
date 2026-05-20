@@ -20,7 +20,6 @@ const AdminUsersPage: React.FC = () => {
 				setUsers(data)
 				setLoadError(null)
 			} catch (error) {
-				console.error('Error fetching users:', error)
 				setLoadError(getApiErrorMessage(error, 'Could not load users. Please try again.'))
 			} finally {
 				setIsLoading(false)
