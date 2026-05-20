@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { User } from '../models/types.ts'
 import { get } from '../api/http'
+import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 
 const AdminUsersPage: React.FC = () => {
 	const navigate = useNavigate()
@@ -12,13 +13,15 @@ const AdminUsersPage: React.FC = () => {
 
 	useEffect(() => {
 		const fetchUsers = async () => {
+			setIsLoading(true)
+
 			try {
 				const data = await get<User[]>('/users')
 				setUsers(data)
 				setLoadError(null)
-			} catch (err) {
-				console.error('Error fetching users:', err)
-				setLoadError('Could not load users. Is your backend running?')
+			} catch (error) {
+				console.error('Error fetching users:', error)
+				setLoadError(getApiErrorMessage(error, 'Could not load users. Please try again.'))
 			} finally {
 				setIsLoading(false)
 			}

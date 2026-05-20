@@ -1,6 +1,9 @@
 import type { ApiErrorResponse } from '../../models/api-error.types.ts'
 import { ApiError } from '../ApiError.ts'
 import { getBookErrorMessage } from './bookErrorMessages.ts'
+import { getGeneralErrorMessage } from './generalErrorMessages.ts'
+import { getAuthErrorMessage } from './authErrorMessages.ts'
+import { getUserErrorMessage } from './userErrorMessages.ts'
 
 const defaultFallbackMessage = 'Something went wrong. Please try again later.'
 
@@ -19,10 +22,16 @@ export function getApiErrorMessage(error: unknown, fallback = defaultFallbackMes
 		return fallback
 	}
 
-	const mappedMessage = getDomainErrorMessage(response)
+	const domainMessage = getDomainErrorMessage(response)
 
-	if (mappedMessage) {
-		return mappedMessage
+	if (domainMessage) {
+		return domainMessage
+	}
+
+	const generalMessage = getGeneralErrorMessage(response.code)
+
+	if (generalMessage) {
+		return generalMessage
 	}
 
 	if (response.message) {
@@ -40,8 +49,17 @@ export function getApiErrorMessage(error: unknown, fallback = defaultFallbackMes
 
 function getDomainErrorMessage(response: ApiErrorResponse): string | null {
 	switch (response.domain) {
+		case 'AUTH':
+			return getAuthErrorMessage(response.code)
+
 		case 'BOOK':
 			return getBookErrorMessage(response.code)
+
+		case 'USER':
+			return getUserErrorMessage(response.code)
+
+		case 'GENERAL':
+			return getGeneralErrorMessage(response.code)
 
 		default:
 			return null
