@@ -7,9 +7,8 @@ import { post } from '../api/http'
 import type { User } from '../models/types.ts'
 import type { CreateUserRequest } from '../models/request.types.ts'
 import TextAreaField from '../components/TextAreaField.tsx'
-import type { StatusMessageType } from '../components/StatusMessage.tsx'
-import StatusMessage from '../components/StatusMessage.tsx'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
+import { notify } from '../components/notifications/notify.tsx'
 
 interface SignUpFormData {
 	name: string
@@ -32,19 +31,8 @@ function SignUpPage() {
 	const { t } = useTranslation()
 
 	const [formData, setFormData] = useState<SignUpFormData>(emptySignUpForm)
-	const [message, setMessage] = useState<StatusMessageType>(null)
+	const [wasCreatedSuccessfully, setWasCreatedSuccessfully] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
-
-	const errorMessage = message?.type === 'error' ? message : null
-	const successMessage = message?.type === 'success' ? message : null
-
-	const setSuccessMessage = (text: string) => {
-		setMessage({ type: 'success', text })
-	}
-
-	const setErrorMessage = (text: string) => {
-		setMessage({ type: 'error', text })
-	}
 
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = e.target
@@ -57,12 +45,11 @@ function SignUpPage() {
 
 	const handleSignUpSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		setMessage(null)
 
 		const email = formData.email.trim().toLowerCase()
 
 		if (!email.endsWith('@gmail.com')) {
-			setErrorMessage(t('signUp.gmailOnly'))
+			notify.error(t('signUp.gmailOnly'))
 			return
 		}
 
@@ -79,10 +66,10 @@ function SignUpPage() {
 
 			await post<User, CreateUserRequest>('/auth/users/register', request)
 
-			setSuccessMessage(t('signUp.success'))
+			setWasCreatedSuccessfully(true)
 			setFormData(emptySignUpForm)
 		} catch (error) {
-			setErrorMessage(getApiErrorMessage(error, t, t('signUp.createError')))
+			notify.error(getApiErrorMessage(error, t, t('signUp.createError')))
 		} finally {
 			setIsSubmitting(false)
 		}
@@ -93,9 +80,9 @@ function SignUpPage() {
 			<div className="login-card signup-card">
 				<h2>{t('signUp.title')}</h2>
 
-				{successMessage ? (
+				{wasCreatedSuccessfully ? (
 					<div className="success-view">
-						<h3 className="success-title">{successMessage.text}</h3>
+						<h3 className="success-title">{t('signUp.success')}</h3>
 
 						<button className="login-btn user-btn" onClick={() => navigate('/')}>
 							{t('signUp.goToLogin')}
@@ -103,8 +90,6 @@ function SignUpPage() {
 					</div>
 				) : (
 					<form className="login-form" onSubmit={handleSignUpSubmit}>
-						<StatusMessage message={errorMessage} />
-
 						<TextField
 							label={t('signUp.fullName')}
 							name="name"

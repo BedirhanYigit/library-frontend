@@ -8,13 +8,13 @@ export interface BookRequest {
 }
 
 export interface LoanRequest {
-	bookId: number,
-	userId: number,
+	bookId: number
+	userId: number
 }
 
 export interface ReservationRequest {
-	userId: number,
-	bookId: number,
+	userId: number
+	bookId: number
 }
 
 export interface CreateUserRequest {

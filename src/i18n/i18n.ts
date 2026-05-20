@@ -35,7 +35,7 @@ void i18n
 		detection: {
 			order: ['localStorage', 'navigator'],
 			caches: ['localStorage'],
-		}
+		},
 	})
 
 export default i18n

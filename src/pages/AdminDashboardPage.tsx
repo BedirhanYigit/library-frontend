@@ -1,29 +1,22 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/useAuth.ts'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
-import type { StatusMessageType } from '../components/StatusMessage.tsx'
-import StatusMessage from '../components/StatusMessage.tsx'
+import { notify } from '../components/notifications/notify.tsx'
 
 const AdminDashboardPage: React.FC = () => {
 	const navigate = useNavigate()
 	const { t } = useTranslation()
-	const [message, setMessage] = useState<StatusMessageType>(null)
 
 	const { logout } = useAuth()
 
 	const handleLogout = async () => {
-		setMessage(null)
-
 		try {
 			await logout()
 			navigate('/')
 		} catch (error) {
-			setMessage({
-				type: 'error',
-				text: getApiErrorMessage(error, t, t('adminDashboard.logoutError')),
-			})
+			notify.error(getApiErrorMessage(error, t, t('adminDashboard.logoutError')))
 		}
 	}
 
@@ -48,8 +41,6 @@ const AdminDashboardPage: React.FC = () => {
 					<p>{t('adminDashboard.reservationsDescription')}</p>
 				</div>
 			</div>
-
-			<StatusMessage message={message} />
 
 			<button onClick={handleLogout} className="login-btn back-btn admin-logout-button">
 				{t('adminDashboard.logOut')}

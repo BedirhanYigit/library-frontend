@@ -1,44 +1,44 @@
 .image-toast {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    min-width: 280px;
-    max-width: 360px;
-    padding: 0.875rem 1rem;
-    border-radius: 0.875rem;
-    background: #ffffff;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
-    border: 1px solid #e2e8f0;
-    color: #0f172a;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	min-width: 280px;
+	max-width: 360px;
+	padding: 0.875rem 1rem;
+	border-radius: 0.875rem;
+	background: #ffffff;
+	box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+	border: 1px solid #e2e8f0;
+	color: #0f172a;
 }
 
 .image-toast-success {
-    border-left: 5px solid #22c55e;
+	border-left: 5px solid #22c55e;
 }
 
 .image-toast-error {
-    border-left: 5px solid #ef4444;
+	border-left: 5px solid #ef4444;
 }
 
 .image-toast-image {
-    width: 66px;
-    height: 66px;
-    object-fit: cover;
-    border-radius: 0.75rem;
-    flex-shrink: 0;
+	width: 66px;
+	height: 66px;
+	object-fit: cover;
+	border-radius: 0.75rem;
+	flex-shrink: 0;
 }
 
 .image-toast-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.125rem;
 }
 
 .image-toast-content strong {
-    font-size: 0.95rem;
+	font-size: 0.95rem;
 }
 
 .image-toast-content span {
-    font-size: 0.85rem;
-    color: #64748b;
+	font-size: 0.85rem;
+	color: #64748b;
 }
