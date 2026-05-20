@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Reservation } from '../models/types'
 import { deleteRequest, get } from '../api/http'
 import { useAuth } from '../auth/useAuth.ts'
@@ -9,6 +10,7 @@ import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 
 const MyReservationsPage: React.FC = () => {
 	const navigate = useNavigate()
+	const { t } = useTranslation()
 
 	const [reservations, setReservations] = useState<Reservation[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -20,7 +22,7 @@ const MyReservationsPage: React.FC = () => {
 
 	const fetchReservations = useCallback(async () => {
 		if (!userId) {
-			setLoadError('Please log in again to view your reservations.')
+			setLoadError(t('myReservations.loginAgainView'))
 			setIsLoading(false)
 			return
 		}
@@ -30,11 +32,11 @@ const MyReservationsPage: React.FC = () => {
 			setReservations(data)
 			setLoadError(null)
 		} catch (error) {
-			setLoadError(getApiErrorMessage(error, 'Could not load your reservations. Please try again.'))
+			setLoadError(getApiErrorMessage(error, t, t('myReservations.loadError')))
 		} finally {
 			setIsLoading(false)
 		}
-	}, [userId])
+	}, [t, userId])
 
 	useEffect(() => {
 		if (isAuthLoading) {
@@ -60,16 +62,16 @@ const MyReservationsPage: React.FC = () => {
 		clearActionMessage()
 
 		if (!userId) {
-			setErrorMessage('Please log in again before cancelling a reservation.')
+			setErrorMessage(t('myReservations.loginAgainCancel'))
 			return
 		}
 
 		try {
 			await deleteRequest<void>(`/reservations/${reservationId}`)
-			setSuccessMessage('Reservation cancelled successfully!')
+			setSuccessMessage(t('myReservations.cancelSuccess'))
 			await fetchReservations()
 		} catch (error) {
-			setErrorMessage(getApiErrorMessage(error, 'Could not cancel the reservation. Please try again.'))
+			setErrorMessage(getApiErrorMessage(error, t, t('myReservations.cancelError')))
 		}
 	}
 
@@ -78,59 +80,62 @@ const MyReservationsPage: React.FC = () => {
 			<div className="page-header-actions">
 				<div className="header-button-group">
 					<button className="login-btn back-btn" onClick={() => navigate('/dashboard')}>
-						Back to Dashboard
+						{t('myReservations.backToDashboard')}
 					</button>
 
 					<button className="login-btn user-btn" onClick={() => navigate('/books')}>
-						Browse All Books
+						{t('myReservations.browseAllBooks')}
 					</button>
 
 					<button className="login-btn user-btn" onClick={() => navigate('/my-books')}>
-						My Books
+						{t('myReservations.myBooks')}
 					</button>
 				</div>
 			</div>
 
 			<div className="books-container">
-				<h2>My Reservations</h2>
+				<h2>{t('myReservations.title')}</h2>
 
 				<StatusMessage message={actionMessage} />
 
-				{isLoading && <p>Loading your reservations...</p>}
+				{isLoading && <p>{t('myReservations.loading')}</p>}
 				{loadError && <p className="error-message">{loadError}</p>}
 
-				{!isLoading && !loadError && reservations.length === 0 && <p>You have no active reservations.</p>}
+				{!isLoading && !loadError && reservations.length === 0 && <p>{t('myReservations.empty')}</p>}
 
 				{!isLoading && !loadError && reservations.length > 0 && (
 					<div className="entity-grid">
 						{reservations.map((reservation) => (
 							<div key={reservation.id} className="entity-card">
-								<h3 className="entity-card-title">{reservation.book?.title || 'Unknown Title'}</h3>
+								<h3 className="entity-card-title">
+									{reservation.book?.title || t('myReservations.unknownTitle')}
+								</h3>
 
 								<p className="entity-card-detail">
-									<strong>Author:</strong> {reservation.book?.author || 'N/A'}
+									<strong>{t('book.author')}:</strong> {reservation.book?.author || t('book.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>Genre:</strong> {reservation.book?.genre || 'N/A'}
+									<strong>{t('book.genre')}:</strong> {reservation.book?.genre || t('book.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>ISBN:</strong> {reservation.book?.isbn || 'N/A'}
+									<strong>{t('book.isbn')}:</strong> {reservation.book?.isbn || t('book.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>Reserved On:</strong> {reservation.reservationDate || 'N/A'}
+									<strong>{t('myReservations.reservedOn')}:</strong>{' '}
+									{reservation.reservationDate || t('book.notAvailable')}
 								</p>
 
-								<p className="book-status status-reserved">WAITING FOR COPY</p>
+								<p className="book-status status-reserved">{t('myReservations.waitingForCopy')}</p>
 
 								<div className="entity-card-actions">
 									<button
 										className="login-btn secondary-action-btn"
 										onClick={() => handleCancelReservation(reservation.id)}
 									>
-										Cancel Reservation
+										{t('myReservations.cancelReservation')}
 									</button>
 								</div>
 							</div>
