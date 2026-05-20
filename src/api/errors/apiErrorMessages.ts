@@ -6,8 +6,7 @@ import { getAuthErrorMessage } from './authErrorMessages.ts'
 import { getUserErrorMessage } from './userErrorMessages.ts'
 import { getLoanErrorMessage } from './loanErrorMessages.ts'
 import { getReservationErrorMessage } from './reservationErrorMessages.ts'
-
-const defaultFallbackMessage = 'Something went wrong. Please try again later.'
+import type { TranslationFunction } from '../../i18n/translation.types.ts'
 
 function getApiErrorResponse(error: unknown): ApiErrorResponse | null {
 	if (error instanceof ApiError) {
@@ -17,20 +16,20 @@ function getApiErrorResponse(error: unknown): ApiErrorResponse | null {
 	return null
 }
 
-export function getApiErrorMessage(error: unknown, fallback = defaultFallbackMessage): string {
+export function getApiErrorMessage(error: unknown, t: TranslationFunction, fallback = t('apiErrors.defaultFallback')): string {
 	const response = getApiErrorResponse(error)
 
 	if (!response) {
 		return fallback
 	}
 
-	const domainMessage = getDomainErrorMessage(response)
+	const domainMessage = getDomainErrorMessage(response, t)
 
 	if (domainMessage) {
 		return domainMessage
 	}
 
-	const generalMessage = getGeneralErrorMessage(response.code)
+	const generalMessage = getGeneralErrorMessage(response.code, t)
 
 	if (generalMessage) {
 		return generalMessage
@@ -49,25 +48,25 @@ export function getApiErrorMessage(error: unknown, fallback = defaultFallbackMes
 	return fallback
 }
 
-function getDomainErrorMessage(response: ApiErrorResponse): string | null {
+function getDomainErrorMessage(response: ApiErrorResponse, t: TranslationFunction): string | null {
 	switch (response.domain) {
 		case 'AUTH':
-			return getAuthErrorMessage(response.code)
+			return getAuthErrorMessage(response.code, t)
 
 		case 'BOOK':
-			return getBookErrorMessage(response.code)
+			return getBookErrorMessage(response.code, t)
 
 		case 'LOAN':
-			return getLoanErrorMessage(response.code)
+			return getLoanErrorMessage(response.code, t)
 
 		case 'RESERVATION':
-			return getReservationErrorMessage(response.code)
+			return getReservationErrorMessage(response.code, t)
 
 		case 'USER':
-			return getUserErrorMessage(response.code)
+			return getUserErrorMessage(response.code, t)
 
 		case 'GENERAL':
-			return getGeneralErrorMessage(response.code)
+			return getGeneralErrorMessage(response.code, t)
 
 		default:
 			return null

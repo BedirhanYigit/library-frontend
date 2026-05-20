@@ -10,15 +10,14 @@ import MyBooksPage from './pages/MyBooksPage'
 import MyReservationsPage from './pages/MyReservationsPage'
 import { AuthProvider } from './auth/AuthContext'
 import { ProtectedRoute } from './auth/ProtectedRoute.tsx'
+import AppHeader from './components/AppHeader.tsx'
 
 function App() {
 	return (
 		<AuthProvider>
 			<Router>
 				<div className="app-container">
-					<header className="greeting-header">
-						<h1>Welcome to Deveci Library</h1>
-					</header>
+					<AppHeader />
 
 					<Routes>
 						<Route path="/" element={<LoginPage />} />
@@ -60,7 +59,6 @@ function App() {
 							}
 						/>
 
-						{/*Admin Pages*/}
 						<Route
 							path="/admin-dashboard"
 							element={
