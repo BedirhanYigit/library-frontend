@@ -1,18 +1,19 @@
 import { AuthApiErrorCode } from '../../models/api-error.types'
+import type { TranslationFunction } from '../../i18n/translation.types.ts'
 
-const authErrorMessages: Record<AuthApiErrorCode, string> = {
-	[AuthApiErrorCode.EmailAlreadyExists]: 'An account with this email already exists.',
-	[AuthApiErrorCode.InvalidCredentials]: 'Invalid email or password.',
-	[AuthApiErrorCode.AuthenticationRequired]: 'Please log in to continue.',
-	[AuthApiErrorCode.AdminAccessRequired]: 'You need admin access to view this page.',
+const authErrorMessageKeys: Record<AuthApiErrorCode, string> = {
+	[AuthApiErrorCode.EmailAlreadyExists]: 'apiErrors.auth.emailAlreadyExists',
+	[AuthApiErrorCode.InvalidCredentials]: 'apiErrors.auth.invalidCredentials',
+	[AuthApiErrorCode.AuthenticationRequired]: 'apiErrors.auth.authenticationRequired',
+	[AuthApiErrorCode.AdminAccessRequired]: 'apiErrors.auth.adminAccessRequired',
 }
 
-export function getAuthErrorMessage(code: string): string | null {
+export function getAuthErrorMessage(code: string, t: TranslationFunction): string | null {
 	if (!isAuthApiErrorCode(code)) {
 		return null
 	}
 
-	return authErrorMessages[code]
+	return t(authErrorMessageKeys[code])
 }
 
 function isAuthApiErrorCode(code: string): code is AuthApiErrorCode {

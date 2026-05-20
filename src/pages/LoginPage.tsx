@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import LoginForm from '../components/LoginForm.tsx'
 import { useAuth } from '../auth/useAuth.ts'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
@@ -11,6 +12,7 @@ const LoginPage: React.FC = () => {
 	const [errorMessage, setErrorMessage] = useState<string>('')
 
 	const navigate = useNavigate()
+	const { t } = useTranslation()
 	const { loginAsUser, loginAsAdmin } = useAuth()
 
 	const handleLoginSubmit = async (email: string, password: string) => {
@@ -25,7 +27,7 @@ const LoginPage: React.FC = () => {
 				navigate('/dashboard')
 			}
 		} catch (error) {
-			setErrorMessage(getApiErrorMessage(error, 'Invalid email or password.'))
+			setErrorMessage(getApiErrorMessage(error, t, t('login.invalidCredentials')))
 		}
 	}
 
@@ -37,24 +39,25 @@ const LoginPage: React.FC = () => {
 	return (
 		<main className="login-section login-section-relative">
 			<div className="top-right-action">
-				<span className="top-right-action-text">New to the library?</span>
+				<span className="top-right-action-text">{t('login.newToLibrary')}</span>
 
 				<button className="login-btn user-btn signup-nav-button" onClick={() => navigate('/signup')}>
-					Sign Up
+					{t('login.signUp')}
 				</button>
 			</div>
 
 			<div className="login-card">
 				{currentView === 'selection' && (
 					<>
-						<h2>Select Login Type</h2>
+						<h2>{t('login.selectLoginType')}</h2>
+
 						<div className="button-group">
 							<button className="login-btn user-btn" onClick={() => setCurrentView('user-login')}>
-								User Login
+								{t('login.userLogin')}
 							</button>
 
 							<button className="login-btn admin-btn" onClick={() => setCurrentView('admin-login')}>
-								Admin Login
+								{t('login.adminLogin')}
 							</button>
 						</div>
 					</>

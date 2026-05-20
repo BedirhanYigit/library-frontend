@@ -1,17 +1,18 @@
 import { GeneralApiErrorCode } from '../../models/api-error.types'
+import type { TranslationFunction } from '../../i18n/translation.types.ts'
 
-const generalErrorMessages: Record<GeneralApiErrorCode, string> = {
-	[GeneralApiErrorCode.RequestValidationFailed]: 'The request contains invalid data.',
-	[GeneralApiErrorCode.RequestFieldInvalid]: 'One of the submitted fields is invalid.',
-	[GeneralApiErrorCode.InternalServerError]: 'An unexpected server error occurred. Please try again later.',
+const generalErrorMessageKeys: Record<GeneralApiErrorCode, string> = {
+	[GeneralApiErrorCode.RequestValidationFailed]: 'apiErrors.general.requestValidationFailed',
+	[GeneralApiErrorCode.RequestFieldInvalid]: 'apiErrors.general.requestFieldInvalid',
+	[GeneralApiErrorCode.InternalServerError]: 'apiErrors.general.internalServerError',
 }
 
-export function getGeneralErrorMessage(code: string): string | null {
+export function getGeneralErrorMessage(code: string, t: TranslationFunction): string | null {
 	if (!isGeneralApiErrorCode(code)) {
 		return null
 	}
 
-	return generalErrorMessages[code]
+	return t(generalErrorMessageKeys[code])
 }
 
 function isGeneralApiErrorCode(code: string): code is GeneralApiErrorCode {

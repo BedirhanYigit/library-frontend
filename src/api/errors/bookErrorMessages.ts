@@ -1,17 +1,18 @@
 import { BookApiErrorCode } from '../../models/api-error.types'
+import type { TranslationFunction } from '../../i18n/translation.types.ts'
 
-const bookErrorMessages: Record<BookApiErrorCode, string> = {
-	[BookApiErrorCode.NotFound]: 'The selected book could not be found.',
-	[BookApiErrorCode.IsbnAlreadyExists]: 'A book with this ISBN already exists.',
-	[BookApiErrorCode.TotalCopiesBelowLoanedCopies]: 'Total copies cannot be lower than currently loaned copies.',
+const bookErrorMessageKeys: Record<BookApiErrorCode, string> = {
+	[BookApiErrorCode.NotFound]: 'apiErrors.book.notFound',
+	[BookApiErrorCode.IsbnAlreadyExists]: 'apiErrors.book.isbnAlreadyExists',
+	[BookApiErrorCode.TotalCopiesBelowLoanedCopies]: 'apiErrors.book.totalCopiesBelowLoanedCopies',
 }
 
-export function getBookErrorMessage(code: string): string | null {
+export function getBookErrorMessage(code: string, t: TranslationFunction): string | null {
 	if (!isBookApiErrorCode(code)) {
 		return null
 	}
 
-	return bookErrorMessages[code]
+	return t(bookErrorMessageKeys[code])
 }
 
 function isBookApiErrorCode(code: string): code is BookApiErrorCode {

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Loan } from '../models/types'
 import { get, post } from '../api/http'
 import { useAuth } from '../auth/useAuth.ts'
@@ -9,6 +10,7 @@ import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 
 const MyBooksPage: React.FC = () => {
 	const navigate = useNavigate()
+	const { t } = useTranslation()
 
 	const [loans, setLoans] = useState<Loan[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -20,7 +22,7 @@ const MyBooksPage: React.FC = () => {
 
 	const fetchMyBooks = useCallback(async () => {
 		if (!userId) {
-			setLoadError('Please log in again to view your loaned books.')
+			setLoadError(t('myBooks.loginAgainView'))
 			setIsLoading(false)
 			return
 		}
@@ -32,11 +34,11 @@ const MyBooksPage: React.FC = () => {
 			setLoans(activeLoans)
 			setLoadError(null)
 		} catch (error) {
-			setLoadError(getApiErrorMessage(error, 'Could not load your books. Please try again.'))
+			setLoadError(getApiErrorMessage(error, t, t('myBooks.loadError')))
 		} finally {
 			setIsLoading(false)
 		}
-	}, [userId])
+	}, [t, userId])
 
 	useEffect(() => {
 		if (isAuthLoading) {
@@ -62,16 +64,16 @@ const MyBooksPage: React.FC = () => {
 		clearActionMessage()
 
 		if (!userId) {
-			setErrorMessage('Please log in again before returning a book.')
+			setErrorMessage(t('myBooks.loginAgainReturn'))
 			return
 		}
 
 		try {
 			await post<void>(`/loans/${loanId}/return`)
-			setSuccessMessage('Book returned successfully!')
+			setSuccessMessage(t('myBooks.returnSuccess'))
 			await fetchMyBooks()
 		} catch (error) {
-			setErrorMessage(getApiErrorMessage(error, 'Could not return the book. Please try again.'))
+			setErrorMessage(getApiErrorMessage(error, t, t('myBooks.returnError')))
 		}
 	}
 
@@ -80,30 +82,28 @@ const MyBooksPage: React.FC = () => {
 			<div className="page-header-actions">
 				<div className="header-button-group">
 					<button className="login-btn back-btn" onClick={() => navigate('/dashboard')}>
-						Back to Dashboard
+						{t('myBooks.backToDashboard')}
 					</button>
 
 					<button className="login-btn user-btn" onClick={() => navigate('/books')}>
-						Browse All Books
+						{t('myBooks.browseAllBooks')}
 					</button>
 
 					<button className="login-btn user-btn reservation-nav-btn" onClick={() => navigate('/my-reservations')}>
-						My Reservations
+						{t('myBooks.myReservations')}
 					</button>
 				</div>
 			</div>
 
 			<div className="books-container">
-				<h2>My Loaned Books</h2>
+				<h2>{t('myBooks.title')}</h2>
 
 				<StatusMessage message={actionMessage} />
 
-				{isLoading && <p>Loading your books...</p>}
+				{isLoading && <p>{t('myBooks.loading')}</p>}
 				{loadError && <p className="error-message">{loadError}</p>}
 
-				{!isLoading && !loadError && loans.length === 0 && (
-					<p>You haven't loaned any books yet. Go browse the catalog!</p>
-				)}
+				{!isLoading && !loadError && loans.length === 0 && <p>{t('myBooks.empty')}</p>}
 
 				{!isLoading && !loadError && loans.length > 0 && (
 					<div className="entity-grid">
@@ -112,30 +112,30 @@ const MyBooksPage: React.FC = () => {
 								<h3 className="entity-card-title">{item.bookTitle}</h3>
 
 								<p className="entity-card-detail">
-									<strong>Author:</strong> {item.author || 'N/A'}
+									<strong>{t('book.author')}:</strong> {item.author || t('book.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>Genre:</strong> {item.genre || 'N/A'}
+									<strong>{t('book.genre')}:</strong> {item.genre || t('book.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>ISBN:</strong> {item.isbn || 'N/A'}
+									<strong>{t('book.isbn')}:</strong> {item.isbn || t('book.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>Loaned On:</strong> {item.loanDate}
+									<strong>{t('myBooks.loanedOn')}:</strong> {item.loanDate}
 								</p>
 
 								<p className="entity-card-detail entity-card-detail-danger">
-									<strong>Due Date:</strong> {item.dueDate}
+									<strong>{t('myBooks.dueDate')}:</strong> {item.dueDate}
 								</p>
 
-								<p className="book-status status-loaned">CURRENTLY LOANED</p>
+								<p className="book-status status-loaned">{t('myBooks.currentlyLoaned')}</p>
 
 								<div className="entity-card-actions">
 									<button className="login-btn danger-btn" onClick={() => handleReturnLoan(item.id)}>
-										Return Book
+										{t('myBooks.returnBook')}
 									</button>
 								</div>
 							</div>

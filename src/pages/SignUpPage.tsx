@@ -1,6 +1,7 @@
 import type { ChangeEvent, SubmitEvent } from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import TextField from '../components/TextField'
 import { post } from '../api/http'
 import type { User } from '../models/types.ts'
@@ -28,6 +29,7 @@ const emptySignUpForm: SignUpFormData = {
 
 function SignUpPage() {
 	const navigate = useNavigate()
+	const { t } = useTranslation()
 
 	const [formData, setFormData] = useState<SignUpFormData>(emptySignUpForm)
 	const [message, setMessage] = useState<StatusMessageType>(null)
@@ -60,7 +62,7 @@ function SignUpPage() {
 		const email = formData.email.trim().toLowerCase()
 
 		if (!email.endsWith('@gmail.com')) {
-			setErrorMessage('Mail addresses other than Gmail are not permitted. Please register with a Gmail address.')
+			setErrorMessage(t('signUp.gmailOnly'))
 			return
 		}
 
@@ -77,10 +79,10 @@ function SignUpPage() {
 
 			await post<User, CreateUserRequest>('/auth/users/register', request)
 
-			setSuccessMessage('Account created successfully! You may now log in.')
+			setSuccessMessage(t('signUp.success'))
 			setFormData(emptySignUpForm)
 		} catch (error) {
-			setErrorMessage(getApiErrorMessage(error, 'Failed to create account. Please try again.'))
+			setErrorMessage(getApiErrorMessage(error, t, t('signUp.createError')))
 		} finally {
 			setIsSubmitting(false)
 		}
@@ -89,24 +91,30 @@ function SignUpPage() {
 	return (
 		<div className="login-section">
 			<div className="login-card signup-card">
-				<h2>Library Registration</h2>
+				<h2>{t('signUp.title')}</h2>
 
 				{successMessage ? (
 					<div className="success-view">
 						<h3 className="success-title">{successMessage.text}</h3>
 
 						<button className="login-btn user-btn" onClick={() => navigate('/')}>
-							Go to Login Page
+							{t('signUp.goToLogin')}
 						</button>
 					</div>
 				) : (
 					<form className="login-form" onSubmit={handleSignUpSubmit}>
 						<StatusMessage message={errorMessage} />
 
-						<TextField label="Full Name" name="name" value={formData.name} onChange={handleInputChange} required />
+						<TextField
+							label={t('signUp.fullName')}
+							name="name"
+							value={formData.name}
+							onChange={handleInputChange}
+							required
+						/>
 
 						<TextField
-							label="Email Address"
+							label={t('signUp.emailAddress')}
 							name="email"
 							type="email"
 							value={formData.email}
@@ -116,7 +124,7 @@ function SignUpPage() {
 						/>
 
 						<TextField
-							label="Password"
+							label={t('signUp.password')}
 							name="password"
 							type="password"
 							value={formData.password}
@@ -125,7 +133,7 @@ function SignUpPage() {
 						/>
 
 						<TextField
-							label="Phone Number"
+							label={t('signUp.phoneNumber')}
 							name="phoneNumber"
 							type="tel"
 							value={formData.phoneNumber}
@@ -134,7 +142,7 @@ function SignUpPage() {
 						/>
 
 						<TextAreaField
-							label="Physical Address"
+							label={t('signUp.physicalAddress')}
 							name="address"
 							value={formData.address}
 							onChange={handleInputChange}
@@ -148,11 +156,11 @@ function SignUpPage() {
 								onClick={() => navigate('/')}
 								disabled={isSubmitting}
 							>
-								Cancel
+								{t('signUp.cancel')}
 							</button>
 
 							<button type="submit" className="login-btn user-btn" disabled={isSubmitting}>
-								{isSubmitting ? 'Creating Account...' : 'Sign Up'}
+								{isSubmitting ? t('signUp.creatingAccount') : t('signUp.submit')}
 							</button>
 						</div>
 					</form>

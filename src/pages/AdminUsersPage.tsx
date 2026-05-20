@@ -1,33 +1,42 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { User } from '../models/types.ts'
 import { get } from '../api/http'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
+import { useAuth } from '../auth/useAuth.ts'
 
 const AdminUsersPage: React.FC = () => {
 	const navigate = useNavigate()
+	const { t } = useTranslation()
 
 	const [users, setUsers] = useState<User[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
 	const [loadError, setLoadError] = useState<string | null>(null)
 
-	useEffect(() => {
-		const fetchUsers = async () => {
-			setIsLoading(true)
+	const { isLoading: isAuthLoading } = useAuth()
 
-			try {
-				const data = await get<User[]>('/users')
-				setUsers(data)
-				setLoadError(null)
-			} catch (error) {
-				setLoadError(getApiErrorMessage(error, 'Could not load users. Please try again.'))
-			} finally {
-				setIsLoading(false)
-			}
+	const fetchUsers = useCallback(async () => {
+		setIsLoading(true)
+
+		try {
+			const data = await get<User[]>('/users')
+			setUsers(data)
+			setLoadError(null)
+		} catch (error) {
+			setLoadError(getApiErrorMessage(error, t, t('adminUsers.loadError')))
+		} finally {
+			setIsLoading(false)
+		}
+	}, [t])
+
+	useEffect(() => {
+		if (isAuthLoading) {
+			return
 		}
 
 		void fetchUsers()
-	}, [])
+	}, [fetchUsers, isAuthLoading])
 
 	const hasUsers = !isLoading && !loadError && users.length > 0
 	const hasNoUsers = !isLoading && !loadError && users.length === 0
@@ -36,17 +45,17 @@ const AdminUsersPage: React.FC = () => {
 		<div className="page-wrapper">
 			<div className="page-header-actions">
 				<button className="login-btn back-btn" onClick={() => navigate('/admin-dashboard')}>
-					Back to Admin Dashboard
+					{t('adminUsers.backToDashboard')}
 				</button>
 			</div>
 
 			<div className="books-container">
-				<h2>Registered Library Users</h2>
+				<h2>{t('adminUsers.title')}</h2>
 
-				{isLoading && <p>Loading users from database...</p>}
+				{isLoading && <p>{t('adminUsers.loading')}</p>}
 				{loadError && <p className="error-message">{loadError}</p>}
 
-				{hasNoUsers && <p>No users found in the system.</p>}
+				{hasNoUsers && <p>{t('adminUsers.empty')}</p>}
 
 				{hasUsers && (
 					<div className="entity-grid">
@@ -55,15 +64,15 @@ const AdminUsersPage: React.FC = () => {
 								<h3 className="entity-card-title">{user.name}</h3>
 
 								<p className="entity-card-detail">
-									<strong>Email:</strong> {user.email}
+									<strong>{t('user.email')}:</strong> {user.email}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>Phone:</strong> {user.phoneNumber || 'N/A'}
+									<strong>{t('user.phone')}:</strong> {user.phoneNumber || t('user.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>Address:</strong> {user.address || 'N/A'}
+									<strong>{t('user.address')}:</strong> {user.address || t('user.notAvailable')}
 								</p>
 							</div>
 						))}

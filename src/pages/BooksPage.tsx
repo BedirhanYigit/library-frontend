@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Book, Loan, Reservation } from '../models/types'
 import { get, post } from '../api/http'
 import type { LoanRequest, ReservationRequest } from '../models/request.types.ts'
@@ -10,6 +11,7 @@ import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 
 const BooksPage: React.FC = () => {
 	const navigate = useNavigate()
+	const { t } = useTranslation()
 
 	const [books, setBooks] = useState<Book[]>([])
 	const [sortOption, setSortOption] = useState<string>('')
@@ -31,16 +33,16 @@ const BooksPage: React.FC = () => {
 				setBooks(data)
 				setLoadError(null)
 			} catch (error) {
-				setLoadError(getApiErrorMessage(error, 'Could not load books. Please try again.'))
+				setLoadError(getApiErrorMessage(error, t, t('books.loadError')))
 			} finally {
 				setIsLoading(false)
 			}
 		},
-		[isAuthLoading],
+		[t],
 	)
 
 	useEffect(() => {
-		if(isAuthLoading) {
+		if (isAuthLoading) {
 			return
 		}
 
@@ -63,16 +65,16 @@ const BooksPage: React.FC = () => {
 		clearActionMessage()
 
 		if (!userId) {
-			setErrorMessage('Please log in before loaning a book.')
+			setErrorMessage(t('books.loginBeforeLoan'))
 			return
 		}
 
 		try {
 			await post<Loan, LoanRequest>('/loans', { bookId, userId })
-			setSuccessMessage('Book loaned successfully!')
+			setSuccessMessage(t('books.loanSuccess'))
 			await fetchBooks()
 		} catch (error) {
-			setErrorMessage(getApiErrorMessage(error, 'Failed to loan book. Please try again.'))
+			setErrorMessage(getApiErrorMessage(error, t, t('books.loanError')))
 		}
 	}
 
@@ -80,15 +82,15 @@ const BooksPage: React.FC = () => {
 		clearActionMessage()
 
 		if (!userId) {
-			setErrorMessage('Please log in before reserving a book.')
+			setErrorMessage(t('books.loginBeforeReserve'))
 			return
 		}
 
 		try {
 			await post<Reservation, ReservationRequest>('/reservations', { userId, bookId })
-			setSuccessMessage('Book reserved successfully! You will be notified when it is available.')
+			setSuccessMessage(t('books.reserveSuccess'))
 		} catch (error) {
-			setErrorMessage(getApiErrorMessage(error, 'Failed to reserve book. Please try again.'))
+			setErrorMessage(getApiErrorMessage(error, t, t('books.reserveError')))
 		}
 	}
 
@@ -121,20 +123,21 @@ const BooksPage: React.FC = () => {
 			<div className="page-header-actions">
 				<div className="header-button-group">
 					<button className="login-btn back-btn" onClick={() => navigate('/dashboard')}>
-						Back to Dashboard
+						{t('books.backToDashboard')}
 					</button>
 
 					<button className="login-btn user-btn" onClick={() => navigate('/my-books')}>
-						My Books
+						{t('books.myBooks')}
 					</button>
 
 					<button className="login-btn user-btn reservation-nav-btn" onClick={() => navigate('/my-reservations')}>
-						My Reservations
+						{t('books.myReservations')}
 					</button>
 				</div>
 
 				<div className="sort-container">
-					<label htmlFor="sort">Sort by: </label>
+					<label htmlFor="sort">{t('books.sortBy')} </label>
+
 					<select
 						id="sort"
 						className="sort-select"
@@ -143,24 +146,25 @@ const BooksPage: React.FC = () => {
 						disabled={isLoading || loadError !== null}
 					>
 						<option value="" disabled>
-							Select option...
+							{t('books.selectSortOption')}
 						</option>
-						<option value="title-asc">Title (A-Z)</option>
-						<option value="title-desc">Title (Z-A)</option>
-						<option value="author-asc">Author Name (A-Z)</option>
+						<option value="title-asc">{t('books.sortTitleAsc')}</option>
+						<option value="title-desc">{t('books.sortTitleDesc')}</option>
+						<option value="author-asc">{t('books.sortAuthorAsc')}</option>
 					</select>
 				</div>
 			</div>
 
 			<div className="books-container">
-				<h2>Library Books</h2>
+				<h2>{t('books.title')}</h2>
 
 				<StatusMessage message={actionMessage} />
 
-				{isLoading && <p>Loading books from database...</p>}
+				{isLoading && <p>{t('books.loading')}</p>}
 				{loadError && <p className="error-message">{loadError}</p>}
 
-				{hasNoBooks && <p>No books found.</p>}
+				{hasNoBooks && <p>{t('books.empty')}</p>}
+
 				{hasBooks && (
 					<div className="entity-grid">
 						{books.map((book) => (
@@ -168,23 +172,24 @@ const BooksPage: React.FC = () => {
 								<h3 className="entity-card-title">{book.title}</h3>
 
 								<p className="entity-card-detail">
-									<strong>Author:</strong> {book.author}
+									<strong>{t('book.author')}:</strong> {book.author}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>Genre:</strong> {book.genre || 'N/A'}
+									<strong>{t('book.genre')}:</strong> {book.genre || t('book.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>ISBN:</strong> {book.isbn}
+									<strong>{t('book.isbn')}:</strong> {book.isbn}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>Available Copies:</strong> {book.numOfCopiesAvailable} / {book.numOfTotalCopies}
+									<strong>{t('books.availableCopies')}:</strong> {book.numOfCopiesAvailable} /{' '}
+									{book.numOfTotalCopies}
 								</p>
 
 								<p className={`book-status status-${isAvailable(book) ? 'available' : 'loaned'}`}>
-									{isAvailable(book) ? 'AVAILABLE' : 'UNAVAILABLE'}
+									{isAvailable(book) ? t('books.available') : t('books.unavailable')}
 								</p>
 
 								<div className="entity-card-actions">
@@ -193,11 +198,11 @@ const BooksPage: React.FC = () => {
 											className="login-btn user-btn full-width-button compact-button"
 											onClick={() => handleLoanBook(book.id)}
 										>
-											Loan Book
+											{t('books.loanBook')}
 										</button>
 									) : (
 										<button className="login-btn reserve-btn" onClick={() => handleReserveBook(book.id)}>
-											Reserve Book
+											{t('books.reserveBook')}
 										</button>
 									)}
 								</div>

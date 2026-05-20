@@ -1,16 +1,17 @@
 import { ReservationApiErrorCode } from '../../models/api-error.types'
+import type { TranslationFunction } from '../../i18n/translation.types.ts'
 
-const reservationErrorMessages: Record<ReservationApiErrorCode, string> = {
-	[ReservationApiErrorCode.NotFound]: 'The selected reservation could not be found.',
-	[ReservationApiErrorCode.ReservationAlreadyExists]: 'You already have an active reservation for this book.',
+const reservationErrorMessageKeys: Record<ReservationApiErrorCode, string> = {
+	[ReservationApiErrorCode.NotFound]: 'apiErrors.reservation.notFound',
+	[ReservationApiErrorCode.ReservationAlreadyExists]: 'apiErrors.reservation.reservationAlreadyExists',
 }
 
-export function getReservationErrorMessage(code: string): string | null {
+export function getReservationErrorMessage(code: string, t: TranslationFunction): string | null {
 	if (!isReservationApiErrorCode(code)) {
 		return null
 	}
 
-	return reservationErrorMessages[code]
+	return t(reservationErrorMessageKeys[code])
 }
 
 function isReservationApiErrorCode(code: string): code is ReservationApiErrorCode {

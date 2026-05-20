@@ -1,6 +1,6 @@
-import type { ChangeEvent, SubmitEvent } from 'react'
-import { useEffect, useState } from 'react'
+import { type ChangeEvent, type SubmitEvent, useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Book } from '../models/types.ts'
 import type { BookRequest } from '../models/request.types'
 import { get, post, put } from '../api/http'
@@ -8,6 +8,7 @@ import TextField from '../components/TextField.tsx'
 import type { StatusMessageType } from '../components/StatusMessage.tsx'
 import StatusMessage from '../components/StatusMessage.tsx'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
+import { useAuth } from '../auth/useAuth.ts'
 
 interface BookFormData {
 	title: string
@@ -29,6 +30,7 @@ const emptyBookForm: BookFormData = {
 
 function AdminBooksPage() {
 	const navigate = useNavigate()
+	const { t } = useTranslation()
 
 	const [books, setBooks] = useState<Book[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -41,24 +43,30 @@ function AdminBooksPage() {
 
 	const [formData, setFormData] = useState<BookFormData>(emptyBookForm)
 
-	const fetchBooks = async () => {
+	const { isLoading: isAuthLoading } = useAuth()
+
+	const fetchBooks = useCallback(async () => {
 		setIsLoading(true)
 
 		try {
 			const data = await get<Book[]>('/books')
 			setBooks(data)
 			setLoadError(null)
-		} catch (err) {
-			console.error('Error fetching books:', err)
-			setLoadError('Could not load books. Is your backend running?')
+		} catch (error) {
+			console.error('Error fetching books:', error)
+			setLoadError(getApiErrorMessage(error, t, t('adminBooks.loadError')))
 		} finally {
 			setIsLoading(false)
 		}
-	}
+	}, [t])
 
 	useEffect(() => {
+		if (isAuthLoading) {
+			return
+		}
+
 		void fetchBooks()
-	}, [])
+	}, [fetchBooks, isAuthLoading])
 
 	const setFormErrorMessage = (message: string) => {
 		setFormMessage({ type: 'error', text: message })
@@ -115,7 +123,7 @@ function AdminBooksPage() {
 		const totalCopies = Number(formData.numOfTotalCopies)
 
 		if (!Number.isInteger(totalCopies) || totalCopies < 1) {
-			setFormErrorMessage('Total number of copies must be at least 1.')
+			setFormErrorMessage(t('adminBooks.totalCopiesValidation'))
 			setIsSubmitting(false)
 			return
 		}
@@ -141,11 +149,8 @@ function AdminBooksPage() {
 			setFormData(emptyBookForm)
 			await fetchBooks()
 		} catch (error) {
-			const fallbackMessage = editingBook
-				? 'Failed to update the book. Please check the entered values.'
-				: 'Failed to add the book. Please check the entered values.'
-
-			setFormErrorMessage(getApiErrorMessage(error, fallbackMessage))
+			const fallbackMessage = editingBook ? t('adminBooks.updateError') : t('adminBooks.createError')
+			setFormErrorMessage(getApiErrorMessage(error, t, fallbackMessage))
 		} finally {
 			setIsSubmitting(false)
 		}
@@ -155,31 +160,49 @@ function AdminBooksPage() {
 		<div className="page-wrapper">
 			<div className="page-header-actions">
 				<button className="login-btn back-btn" onClick={() => navigate('/admin-dashboard')}>
-					Back to Admin Dashboard
+					{t('adminBooks.backToDashboard')}
 				</button>
 
 				<button className="login-btn admin-btn" onClick={handleAddNewClick}>
-					+ Add New Book
+					{t('adminBooks.addNewBook')}
 				</button>
 			</div>
 
 			{showForm && (
 				<div className="admin-form-container">
-					<h2>{editingBook ? 'Update Book Details' : 'Add New Book'}</h2>
+					<h2>{editingBook ? t('adminBooks.updateBookDetails') : t('adminBooks.createBookTitle')}</h2>
 
 					<form className="login-form" onSubmit={handleSubmit}>
 						<StatusMessage message={formMessage} />
 
-						<TextField label="Title" name="title" value={formData.title} onChange={handleInputChange} required />
-
-						<TextField label="Author" name="author" value={formData.author} onChange={handleInputChange} required />
-
-						<TextField label="Genre" name="genre" value={formData.genre} onChange={handleInputChange} />
-
-						<TextField label="ISBN" name="isbn" value={formData.isbn} onChange={handleInputChange} required />
+						<TextField
+							label={t('book.title')}
+							name="title"
+							value={formData.title}
+							onChange={handleInputChange}
+							required
+						/>
 
 						<TextField
-							label="Total Number of Copies"
+							label={t('book.author')}
+							name="author"
+							value={formData.author}
+							onChange={handleInputChange}
+							required
+						/>
+
+						<TextField label={t('book.genre')} name="genre" value={formData.genre} onChange={handleInputChange} />
+
+						<TextField
+							label={t('book.isbn')}
+							name="isbn"
+							value={formData.isbn}
+							onChange={handleInputChange}
+							required
+						/>
+
+						<TextField
+							label={t('book.totalNumberOfCopies')}
 							name="numOfTotalCopies"
 							type="number"
 							value={formData.numOfTotalCopies}
@@ -189,7 +212,7 @@ function AdminBooksPage() {
 						/>
 
 						<TextField
-							label="Cover Image URL"
+							label={t('book.coverImageUrl')}
 							name="coverImageUrl"
 							type="url"
 							value={formData.coverImageUrl}
@@ -204,11 +227,15 @@ function AdminBooksPage() {
 								onClick={handleCancelForm}
 								disabled={isSubmitting}
 							>
-								Cancel
+								{t('adminBooks.cancel')}
 							</button>
 
 							<button type="submit" className="login-btn admin-btn" disabled={isSubmitting}>
-								{isSubmitting ? 'Saving...' : editingBook ? 'Save Changes' : 'Create Book'}
+								{isSubmitting
+									? t('adminBooks.saving')
+									: editingBook
+										? t('adminBooks.saveChanges')
+										: t('adminBooks.createBook')}
 							</button>
 						</div>
 					</form>
@@ -216,12 +243,12 @@ function AdminBooksPage() {
 			)}
 
 			<div className="books-container books-container-spaced">
-				<h2>Library Inventory</h2>
+				<h2>{t('adminBooks.inventoryTitle')}</h2>
 
-				{isLoading && <p>Loading...</p>}
+				{isLoading && <p>{t('adminBooks.loading')}</p>}
 				{loadError && <p className="error-message">{loadError}</p>}
 
-				{!isLoading && !loadError && books.length === 0 && <p>No books found.</p>}
+				{!isLoading && !loadError && books.length === 0 && <p>{t('adminBooks.empty')}</p>}
 
 				{!isLoading && !loadError && books.length > 0 && (
 					<div className="entity-grid">
@@ -230,19 +257,19 @@ function AdminBooksPage() {
 								<h3 className="entity-card-title">{book.title}</h3>
 
 								<p className="entity-card-detail">
-									<strong>Author:</strong> {book.author}
+									<strong>{t('book.author')}:</strong> {book.author}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>Genre:</strong> {book.genre || 'N/A'}
+									<strong>{t('book.genre')}:</strong> {book.genre || t('book.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>ISBN:</strong> {book.isbn}
+									<strong>{t('book.isbn')}:</strong> {book.isbn}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>Available:</strong> {book.numOfCopiesAvailable} / {book.numOfTotalCopies}
+									<strong>{t('book.available')}:</strong> {book.numOfCopiesAvailable} / {book.numOfTotalCopies}
 								</p>
 
 								<div className="entity-card-actions">
@@ -250,7 +277,7 @@ function AdminBooksPage() {
 										className="login-btn user-btn full-width-button compact-button"
 										onClick={() => handleEditClick(book)}
 									>
-										Update Details
+										{t('adminBooks.updateDetails')}
 									</button>
 								</div>
 							</div>
