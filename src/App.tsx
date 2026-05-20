@@ -11,6 +11,7 @@ import MyReservationsPage from './pages/MyReservationsPage'
 import { AuthProvider } from './auth/AuthContext'
 import { ProtectedRoute } from './auth/ProtectedRoute.tsx'
 import AppHeader from './components/AppHeader.tsx'
+import { Toaster } from 'sonner'
 
 function App() {
 	return (
@@ -88,6 +89,7 @@ function App() {
 
 						<Route path="*" element={<Navigate to="/" />} />
 					</Routes>
+					<Toaster richColors position="top-right" />
 				</div>
 			</Router>
 		</AuthProvider>

@@ -4,10 +4,9 @@ import { useTranslation } from 'react-i18next'
 import type { Loan } from '../models/types'
 import { get, post } from '../api/http'
 import { useAuth } from '../auth/useAuth.ts'
-import type { StatusMessageType } from '../components/StatusMessage.tsx'
-import StatusMessage from '../components/StatusMessage.tsx'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 import { formatDate } from '../i18n/dateFormatting.ts'
+import { notify } from '../components/notifications/notify.tsx'
 
 const MyBooksPage: React.FC = () => {
 	const navigate = useNavigate()
@@ -16,7 +15,6 @@ const MyBooksPage: React.FC = () => {
 	const [loans, setLoans] = useState<Loan[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
 	const [loadError, setLoadError] = useState<string | null>(null)
-	const [actionMessage, setActionMessage] = useState<StatusMessageType>(null)
 
 	const { currentUser, isLoading: isAuthLoading } = useAuth()
 	const userId = currentUser?.id
@@ -49,32 +47,18 @@ const MyBooksPage: React.FC = () => {
 		void fetchMyBooks()
 	}, [fetchMyBooks, isAuthLoading])
 
-	const setSuccessMessage = (message: string) => {
-		setActionMessage({ type: 'success', text: message })
-	}
-
-	const setErrorMessage = (message: string) => {
-		setActionMessage({ type: 'error', text: message })
-	}
-
-	const clearActionMessage = () => {
-		setActionMessage(null)
-	}
-
 	const handleReturnLoan = async (loanId: number) => {
-		clearActionMessage()
-
 		if (!userId) {
-			setErrorMessage(t('myBooks.loginAgainReturn'))
+			notify.error(t('myBooks.loginAgainReturn'))
 			return
 		}
 
 		try {
 			await post<void>(`/loans/${loanId}/return`)
-			setSuccessMessage(t('myBooks.returnSuccess'))
+			notify.success(t('myBooks.returnSuccess'))
 			await fetchMyBooks()
 		} catch (error) {
-			setErrorMessage(getApiErrorMessage(error, t, t('myBooks.returnError')))
+			notify.error(getApiErrorMessage(error, t, t('myBooks.returnError')))
 		}
 	}
 
@@ -98,8 +82,6 @@ const MyBooksPage: React.FC = () => {
 
 			<div className="books-container">
 				<h2>{t('myBooks.title')}</h2>
-
-				<StatusMessage message={actionMessage} />
 
 				{isLoading && <p>{t('myBooks.loading')}</p>}
 				{loadError && <p className="error-message">{loadError}</p>}

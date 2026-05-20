@@ -44,6 +44,8 @@ export const zh = {
 		totalCopiesValidation: '总副本数必须至少为 1。',
 		updateError: '更新图书失败。请检查输入的值。',
 		createError: '添加图书失败。请检查输入的值。',
+		createSuccess: '图书创建成功。',
+		updateSuccess: '图书更新成功。',
 		cancel: '取消',
 		saving: '正在保存...',
 		saveChanges: '保存更改',

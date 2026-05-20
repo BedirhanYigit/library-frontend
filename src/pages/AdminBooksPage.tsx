@@ -5,10 +5,9 @@ import type { Book } from '../models/types.ts'
 import type { BookRequest } from '../models/request.types'
 import { get, post, put } from '../api/http'
 import TextField from '../components/TextField.tsx'
-import type { StatusMessageType } from '../components/StatusMessage.tsx'
-import StatusMessage from '../components/StatusMessage.tsx'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 import { useAuth } from '../auth/useAuth.ts'
+import { notify } from '../components/notifications/notify.tsx'
 
 interface BookFormData {
 	title: string
@@ -38,7 +37,6 @@ function AdminBooksPage() {
 
 	const [showForm, setShowForm] = useState<boolean>(false)
 	const [editingBook, setEditingBook] = useState<Book | null>(null)
-	const [formMessage, setFormMessage] = useState<StatusMessageType>(null)
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
 	const [formData, setFormData] = useState<BookFormData>(emptyBookForm)
@@ -68,14 +66,6 @@ function AdminBooksPage() {
 		void fetchBooks()
 	}, [fetchBooks, isAuthLoading])
 
-	const setFormErrorMessage = (message: string) => {
-		setFormMessage({ type: 'error', text: message })
-	}
-
-	const clearFormMessage = () => {
-		setFormMessage(null)
-	}
-
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
 
@@ -86,7 +76,6 @@ function AdminBooksPage() {
 	}
 
 	const handleEditClick = (book: Book) => {
-		clearFormMessage()
 		setEditingBook(book)
 
 		setFormData({
@@ -103,7 +92,6 @@ function AdminBooksPage() {
 	}
 
 	const handleAddNewClick = () => {
-		clearFormMessage()
 		setEditingBook(null)
 		setFormData(emptyBookForm)
 		setShowForm(true)
@@ -112,18 +100,16 @@ function AdminBooksPage() {
 	const handleCancelForm = () => {
 		setShowForm(false)
 		setEditingBook(null)
-		clearFormMessage()
 	}
 
 	const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setIsSubmitting(true)
-		clearFormMessage()
 
 		const totalCopies = Number(formData.numOfTotalCopies)
 
 		if (!Number.isInteger(totalCopies) || totalCopies < 1) {
-			setFormErrorMessage(t('adminBooks.totalCopiesValidation'))
+			notify.error(t('adminBooks.totalCopiesValidation'))
 			setIsSubmitting(false)
 			return
 		}
@@ -140,8 +126,10 @@ function AdminBooksPage() {
 		try {
 			if (editingBook) {
 				await put<Book, BookRequest>(`/books/${editingBook.id}`, payload)
+				notify.success(t('adminBooks.updateSuccess'))
 			} else {
 				await post<Book, BookRequest>('/books', payload)
+				notify.success(t('adminBooks.createSuccess'))
 			}
 
 			setShowForm(false)
@@ -150,7 +138,7 @@ function AdminBooksPage() {
 			await fetchBooks()
 		} catch (error) {
 			const fallbackMessage = editingBook ? t('adminBooks.updateError') : t('adminBooks.createError')
-			setFormErrorMessage(getApiErrorMessage(error, t, fallbackMessage))
+			notify.error(getApiErrorMessage(error, t, fallbackMessage))
 		} finally {
 			setIsSubmitting(false)
 		}
@@ -173,8 +161,6 @@ function AdminBooksPage() {
 					<h2>{editingBook ? t('adminBooks.updateBookDetails') : t('adminBooks.createBookTitle')}</h2>
 
 					<form className="login-form" onSubmit={handleSubmit}>
-						<StatusMessage message={formMessage} />
-
 						<TextField
 							label={t('book.title')}
 							name="title"

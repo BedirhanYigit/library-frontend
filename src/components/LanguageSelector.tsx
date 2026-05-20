@@ -1,6 +1,7 @@
 import { languageLabels, type SupportedLanguage, supportedLanguages } from '../i18n/i18n.ts'
 import { useTranslation } from 'react-i18next'
 import type { ChangeEvent } from 'react'
+import { notify } from './notifications/notify.tsx'
 
 function isSupportedLanguage(value: string): value is SupportedLanguage {
 	return supportedLanguages.includes(value as SupportedLanguage)
@@ -18,6 +19,7 @@ function LanguageSelector() {
 			return
 		}
 
+		notify.languageSelectionBonus(nextLanguage)
 		await i18n.changeLanguage(nextLanguage)
 	}
 

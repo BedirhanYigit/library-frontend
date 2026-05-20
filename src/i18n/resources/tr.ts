@@ -44,6 +44,8 @@ export const tr = {
 		totalCopiesValidation: 'Toplam kopya sayısı en az 1 olmalıdır.',
 		updateError: 'Kitap güncellenemedi. Lütfen girilen değerleri kontrol edin.',
 		createError: 'Kitap eklenemedi. Lütfen girilen değerleri kontrol edin.',
+		createSuccess: 'Kitap başarıyla oluşturuldu.',
+		updateSuccess: 'Kitap başarıyla güncellendi.',
 		cancel: 'İptal',
 		saving: 'Kaydediliyor...',
 		saveChanges: 'Değişiklikleri Kaydet',
