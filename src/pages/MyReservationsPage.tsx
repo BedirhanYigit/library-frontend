@@ -7,10 +7,11 @@ import { useAuth } from '../auth/useAuth.ts'
 import type { StatusMessageType } from '../components/StatusMessage.tsx'
 import StatusMessage from '../components/StatusMessage.tsx'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
+import { formatDate } from '../i18n/dateFormatting.ts'
 
 const MyReservationsPage: React.FC = () => {
 	const navigate = useNavigate()
-	const { t } = useTranslation()
+	const { t, i18n } = useTranslation()
 
 	const [reservations, setReservations] = useState<Reservation[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -125,7 +126,7 @@ const MyReservationsPage: React.FC = () => {
 
 								<p className="entity-card-detail">
 									<strong>{t('myReservations.reservedOn')}:</strong>{' '}
-									{reservation.reservationDate || t('book.notAvailable')}
+									{formatDate(reservation.reservationDate, i18n.language) || t('book.notAvailable')}
 								</p>
 
 								<p className="book-status status-reserved">{t('myReservations.waitingForCopy')}</p>

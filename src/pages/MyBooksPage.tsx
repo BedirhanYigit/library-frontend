@@ -7,10 +7,11 @@ import { useAuth } from '../auth/useAuth.ts'
 import type { StatusMessageType } from '../components/StatusMessage.tsx'
 import StatusMessage from '../components/StatusMessage.tsx'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
+import { formatDate } from '../i18n/dateFormatting.ts'
 
 const MyBooksPage: React.FC = () => {
 	const navigate = useNavigate()
-	const { t } = useTranslation()
+	const { t, i18n } = useTranslation()
 
 	const [loans, setLoans] = useState<Loan[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -124,11 +125,11 @@ const MyBooksPage: React.FC = () => {
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>{t('myBooks.loanedOn')}:</strong> {item.loanDate}
+									<strong>{t('myBooks.loanedOn')}:</strong> {formatDate(item.loanDate, i18n.language)}
 								</p>
 
 								<p className="entity-card-detail entity-card-detail-danger">
-									<strong>{t('myBooks.dueDate')}:</strong> {item.dueDate}
+									<strong>{t('myBooks.dueDate')}:</strong> {formatDate(item.dueDate, i18n.language)}
 								</p>
 
 								<p className="book-status status-loaned">{t('myBooks.currentlyLoaned')}</p>
