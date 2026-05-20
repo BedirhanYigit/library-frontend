@@ -6,6 +6,7 @@ import type { LoanRequest, ReservationRequest } from '../models/request.types.ts
 import { useAuth } from '../auth/useAuth.ts'
 import type { StatusMessageType } from '../components/StatusMessage.tsx'
 import StatusMessage from '../components/StatusMessage.tsx'
+import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 
 const BooksPage: React.FC = () => {
 	const navigate = useNavigate()
@@ -21,10 +22,6 @@ const BooksPage: React.FC = () => {
 
 	const fetchBooks = useCallback(
 		async (options?: { showLoading?: boolean }) => {
-			if (isAuthLoading) {
-				return
-			}
-
 			if (options?.showLoading) {
 				setIsLoading(true)
 			}
@@ -33,8 +30,8 @@ const BooksPage: React.FC = () => {
 				const data = await get<Book[]>('/books')
 				setBooks(data)
 				setLoadError(null)
-			} catch {
-				setLoadError('Could not load books. Is your backend running?')
+			} catch (error) {
+				setLoadError(getApiErrorMessage(error, 'Could not load books. Please try again.'))
 			} finally {
 				setIsLoading(false)
 			}
@@ -43,8 +40,12 @@ const BooksPage: React.FC = () => {
 	)
 
 	useEffect(() => {
-		void fetchBooks()
-	}, [fetchBooks])
+		if(isAuthLoading) {
+			return
+		}
+
+		void fetchBooks({ showLoading: true })
+	}, [fetchBooks, isAuthLoading])
 
 	const setSuccessMessage = (message: string) => {
 		setActionMessage({ type: 'success', text: message })
@@ -62,7 +63,7 @@ const BooksPage: React.FC = () => {
 		clearActionMessage()
 
 		if (!userId) {
-			setErrorMessage('Error: User ID missing. Please log in.')
+			setErrorMessage('Please log in before loaning a book.')
 			return
 		}
 
@@ -70,8 +71,8 @@ const BooksPage: React.FC = () => {
 			await post<Loan, LoanRequest>('/loans', { bookId, userId })
 			setSuccessMessage('Book loaned successfully!')
 			await fetchBooks()
-		} catch {
-			setErrorMessage('Failed to loan book. You may have reached your limit.')
+		} catch (error) {
+			setErrorMessage(getApiErrorMessage(error, 'Failed to loan book. Please try again.'))
 		}
 	}
 
@@ -79,15 +80,15 @@ const BooksPage: React.FC = () => {
 		clearActionMessage()
 
 		if (!userId) {
-			setErrorMessage('Error: User ID missing. Please log in.')
+			setErrorMessage('Please log in before reserving a book.')
 			return
 		}
 
 		try {
 			await post<Reservation, ReservationRequest>('/reservations', { userId, bookId })
 			setSuccessMessage('Book reserved successfully! You will be notified when it is available.')
-		} catch {
-			setErrorMessage('Failed to reserve book. You might already have a reservation for this.')
+		} catch (error) {
+			setErrorMessage(getApiErrorMessage(error, 'Failed to reserve book. Please try again.'))
 		}
 	}
 
@@ -111,6 +112,9 @@ const BooksPage: React.FC = () => {
 	const isAvailable = (book: Book) => {
 		return book.numOfCopiesAvailable > 0
 	}
+
+	const hasNoBooks = !isLoading && !loadError && books.length === 0
+	const hasBooks = !isLoading && !loadError && books.length > 0
 
 	return (
 		<div className="page-wrapper">
@@ -156,9 +160,8 @@ const BooksPage: React.FC = () => {
 				{isLoading && <p>Loading books from database...</p>}
 				{loadError && <p className="error-message">{loadError}</p>}
 
-				{!isLoading && !loadError && books.length === 0 && <p>No books found.</p>}
-
-				{!isLoading && !loadError && books.length > 0 && (
+				{hasNoBooks && <p>No books found.</p>}
+				{hasBooks && (
 					<div className="entity-grid">
 						{books.map((book) => (
 							<div key={book.id} className="entity-card">

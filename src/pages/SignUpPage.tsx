@@ -8,6 +8,7 @@ import type { CreateUserRequest } from '../models/request.types.ts'
 import TextAreaField from '../components/TextAreaField.tsx'
 import type { StatusMessageType } from '../components/StatusMessage.tsx'
 import StatusMessage from '../components/StatusMessage.tsx'
+import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 
 interface SignUpFormData {
 	name: string
@@ -56,20 +57,30 @@ function SignUpPage() {
 		e.preventDefault()
 		setMessage(null)
 
-		if (!formData.email.toLowerCase().endsWith('@gmail.com')) {
-			setErrorMessage('Mail addresses other than gmail are not permitted. Please register with your gmail provider.')
+		const email = formData.email.trim().toLowerCase()
+
+		if (!email.endsWith('@gmail.com')) {
+			setErrorMessage('Mail addresses other than Gmail are not permitted. Please register with a Gmail address.')
 			return
 		}
 
 		setIsSubmitting(true)
 
 		try {
-			const request: CreateUserRequest = { ...formData }
+			const request: CreateUserRequest = {
+				name: formData.name.trim(),
+				email,
+				password: formData.password,
+				phoneNumber: formData.phoneNumber.trim(),
+				address: formData.address.trim(),
+			}
+
 			await post<User, CreateUserRequest>('/auth/users/register', request)
+
 			setSuccessMessage('Account created successfully! You may now log in.')
 			setFormData(emptySignUpForm)
-		} catch {
-			setErrorMessage('Failed to create account. This email might already be in use.')
+		} catch (error) {
+			setErrorMessage(getApiErrorMessage(error, 'Failed to create account. Please try again.'))
 		} finally {
 			setIsSubmitting(false)
 		}

@@ -1,3 +1,6 @@
+import type { ApiErrorResponse } from '../models/api-error.types.ts'
+import { ApiError } from './ApiError.ts'
+
 const BASE_URL = 'http://localhost:8080'
 
 type RequestParams = Record<string, string | number | boolean>
@@ -16,7 +19,8 @@ function createUrl(path: string, params?: RequestParams): string {
 
 async function handleResponse<T>(response: Response): Promise<T> {
 	if (!response.ok) {
-		throw new Error(`HTTP error! status: ${response.status}`)
+		const errorResponse = await parseErrorResponse(response)
+		throw new ApiError(response.status, errorResponse)
 	}
 
 	if (response.status === 204) {
@@ -47,12 +51,17 @@ export async function get<T>(path: string, params?: RequestParams): Promise<T> {
 }
 
 export async function post<TResponse, TBody = unknown>(path: string, body?: TBody): Promise<TResponse> {
-	const response = await fetch(createUrl(path), {
+	const init: RequestInit = {
 		method: 'POST',
 		credentials: 'include',
-		headers: createJsonHeaders(),
-		body: body ? JSON.stringify(body) : null,
-	})
+	}
+
+	if (body !== undefined) {
+		init.headers = createJsonHeaders()
+		init.body = JSON.stringify(body)
+	}
+
+	const response = await fetch(createUrl(path), init)
 
 	return handleResponse<TResponse>(response)
 }
@@ -75,4 +84,18 @@ export async function deleteRequest<T>(path: string): Promise<T> {
 	})
 
 	return handleResponse<T>(response)
+}
+
+async function parseErrorResponse(response: Response): Promise<ApiErrorResponse | null> {
+	const contentType = response.headers.get('content-type')
+
+	if (!contentType?.includes('application/json')) {
+		return null
+	}
+
+	try {
+		return (await response.json()) as ApiErrorResponse
+	} catch {
+		return null
+	}
 }

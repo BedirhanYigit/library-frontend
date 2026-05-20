@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import type { Loan } from '../models/types'
 import { get, post } from '../api/http'
 import { useAuth } from '../auth/useAuth.ts'
-import StatusMessage from '../components/StatusMessage.tsx'
 import type { StatusMessageType } from '../components/StatusMessage.tsx'
+import StatusMessage from '../components/StatusMessage.tsx'
+import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 
 const MyBooksPage: React.FC = () => {
 	const navigate = useNavigate()
@@ -18,12 +19,8 @@ const MyBooksPage: React.FC = () => {
 	const userId = currentUser?.id
 
 	const fetchMyBooks = useCallback(async () => {
-		if (isAuthLoading) {
-			return
-		}
-
 		if (!userId) {
-			setLoadError('User ID not found. Please log in again.')
+			setLoadError('Please log in again to view your loaned books.')
 			setIsLoading(false)
 			return
 		}
@@ -34,16 +31,20 @@ const MyBooksPage: React.FC = () => {
 
 			setLoans(activeLoans)
 			setLoadError(null)
-		} catch {
-			setLoadError('Could not load your books. Is your backend running?')
+		} catch (error) {
+			setLoadError(getApiErrorMessage(error, 'Could not load your books. Please try again.'))
 		} finally {
 			setIsLoading(false)
 		}
-	}, [isAuthLoading, userId])
+	}, [userId])
 
 	useEffect(() => {
+		if (isAuthLoading) {
+			return
+		}
+
 		void fetchMyBooks()
-	}, [fetchMyBooks])
+	}, [fetchMyBooks, isAuthLoading])
 
 	const setSuccessMessage = (message: string) => {
 		setActionMessage({ type: 'success', text: message })
@@ -61,7 +62,7 @@ const MyBooksPage: React.FC = () => {
 		clearActionMessage()
 
 		if (!userId) {
-			setErrorMessage('User ID not found. Please log in again.')
+			setErrorMessage('Please log in again before returning a book.')
 			return
 		}
 
@@ -69,8 +70,8 @@ const MyBooksPage: React.FC = () => {
 			await post<void>(`/loans/${loanId}/return`)
 			setSuccessMessage('Book returned successfully!')
 			await fetchMyBooks()
-		} catch {
-			setErrorMessage('Network error. Could not connect to the server.')
+		} catch (error) {
+			setErrorMessage(getApiErrorMessage(error, 'Could not return the book. Please try again.'))
 		}
 	}
 

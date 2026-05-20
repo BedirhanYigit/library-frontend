@@ -1,21 +1,28 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth.ts'
+import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
+import type { StatusMessageType } from '../components/StatusMessage.tsx'
+import StatusMessage from '../components/StatusMessage.tsx'
 
 const AdminDashboardPage: React.FC = () => {
 	const navigate = useNavigate()
-	const [error, setError] = useState<string | null>(null)
+	const [message, setMessage] = useState<StatusMessageType>(null)
 
 	const { logout } = useAuth()
 
 	const handleLogout = async () => {
+		setMessage(null)
+
 		try {
 			await logout()
-		} catch {
-			setError('Failed to log out. Please try again.')
+			navigate('/')
+		} catch (error) {
+			setMessage({
+				type: 'error',
+				text: getApiErrorMessage(error, 'Failed to log out. Please try again.'),
+			})
 		}
-
-		navigate('/')
 	}
 
 	return (
@@ -40,7 +47,7 @@ const AdminDashboardPage: React.FC = () => {
 				</div>
 			</div>
 
-			{error && <p className="error-message">{error}</p>}
+			<StatusMessage message={message} />
 
 			<button onClick={handleLogout} className="login-btn back-btn admin-logout-button">
 				Log Out
