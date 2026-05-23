@@ -69,6 +69,10 @@ export const zh = {
 		chooseCoverImage: '选择封面图片',
 		noCoverImageSelected: '未选择图片',
 		coverImageUploadHint: 'PNG、JPG 或 WebP',
+		currentCoverImage: '当前封面图片',
+		removeCoverImage: '移除封面图片',
+		clearSelectedCoverImage: "清除所选图片",
+		coverImageMarkedForRemoval: '封面图片将被移除',
 	},
 	adminUsers: {
 		backToDashboard: '返回管理员仪表板',

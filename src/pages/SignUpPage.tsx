@@ -89,7 +89,7 @@ function SignUpPage() {
 						</button>
 					</div>
 				) : (
-					<form className="login-form" onSubmit={handleSignUpSubmit}>
+					<form className="app-form" onSubmit={handleSignUpSubmit}>
 						<TextField
 							label={t('signUp.fullName')}
 							name="name"

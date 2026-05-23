@@ -69,6 +69,10 @@ export const en = {
 		chooseCoverImage: 'Choose cover image',
 		noCoverImageSelected: 'No image selected',
 		coverImageUploadHint: 'PNG, JPG or WebP',
+		currentCoverImage: 'Current cover image',
+		removeCoverImage: 'Remove cover image',
+		clearSelectedCoverImage: "Clear selected image",
+		coverImageMarkedForRemoval: 'Cover image will be removed',
 	},
 	adminUsers: {
 		backToDashboard: 'Back to Admin Dashboard',

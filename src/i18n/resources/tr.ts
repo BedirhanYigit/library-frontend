@@ -69,6 +69,10 @@ export const tr = {
 		chooseCoverImage: 'Kapak görseli seç',
 		noCoverImageSelected: 'Görsel seçilmedi',
 		coverImageUploadHint: 'PNG, JPG veya WebP',
+		currentCoverImage: 'Mevcut kapak görseli',
+		removeCoverImage: 'Kapak görselini kaldır',
+		clearSelectedCoverImage: "Seçilen görseli kaldır",
+		coverImageMarkedForRemoval: 'Kapak görseli kaldırılacak',
 	},
 	adminUsers: {
 		backToDashboard: 'Admin Paneline Geri Dön',

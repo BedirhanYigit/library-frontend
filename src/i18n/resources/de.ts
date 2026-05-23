@@ -69,6 +69,10 @@ export const de = {
 		chooseCoverImage: 'Titelbild auswählen',
 		noCoverImageSelected: 'Kein Bild ausgewählt',
 		coverImageUploadHint: 'PNG, JPG oder WebP',
+		currentCoverImage: 'Aktuelles Titelbild',
+		removeCoverImage: 'Titelbild entfernen',
+		clearSelectedCoverImage: "Ausgewähltes Bild entfernen",
+		coverImageMarkedForRemoval: 'Titelbild wird entfernt',
 	},
 	adminUsers: {
 		backToDashboard: 'Zurück zum Admin-Dashboard',
