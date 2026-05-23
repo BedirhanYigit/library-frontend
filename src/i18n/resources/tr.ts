@@ -68,10 +68,10 @@ export const tr = {
 		notAvailable: 'Yok',
 		chooseCoverImage: 'Kapak görseli seç',
 		noCoverImageSelected: 'Görsel seçilmedi',
-		coverImageUploadHint: 'PNG, JPG veya WebP',
+		coverImageUploadHint: 'PNG, JPG, WebP veya GIF',
 		currentCoverImage: 'Mevcut kapak görseli',
 		removeCoverImage: 'Kapak görselini kaldır',
-		clearSelectedCoverImage: "Seçilen görseli kaldır",
+		clearSelectedCoverImage: 'Seçilen görseli kaldır',
 		coverImageMarkedForRemoval: 'Kapak görseli kaldırılacak',
 	},
 	adminUsers: {
@@ -182,7 +182,7 @@ export const tr = {
 			isbnAlreadyExists: 'Müdürüm, bu ISBN ile zaten bir kitap mevcut.',
 			totalCopiesBelowLoanedCopies: 'Toplam kopya sayısı, şu anda ödünç verilmiş kopya sayısından az olamaz.',
 			coverImageTooLarge: 'Kapak görseli çok büyük.',
-			invalidCoverImageType: 'Kapak görseli JPEG, PNG veya WebP formatında olmalıdır.',
+			invalidCoverImageType: 'Kapak görseli JPEG, PNG, WebP veya GIF formatında olmalıdır.',
 		},
 		loan: {
 			notFound: 'Seçilen ödünç alma kaydı bulunamadı.',

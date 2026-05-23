@@ -68,10 +68,10 @@ export const de = {
 		notAvailable: 'k. A.',
 		chooseCoverImage: 'Titelbild auswählen',
 		noCoverImageSelected: 'Kein Bild ausgewählt',
-		coverImageUploadHint: 'PNG, JPG oder WebP',
+		coverImageUploadHint: 'PNG, JPG, WebP oder GIF',
 		currentCoverImage: 'Aktuelles Titelbild',
 		removeCoverImage: 'Titelbild entfernen',
-		clearSelectedCoverImage: "Ausgewähltes Bild entfernen",
+		clearSelectedCoverImage: 'Ausgewähltes Bild entfernen',
 		coverImageMarkedForRemoval: 'Titelbild wird entfernt',
 	},
 	adminUsers: {
@@ -183,7 +183,7 @@ export const de = {
 			totalCopiesBelowLoanedCopies:
 				'Die Gesamtanzahl der Exemplare darf nicht niedriger sein als die aktuell ausgeliehenen Exemplare.',
 			coverImageTooLarge: 'Das Titelbild ist zu groß.',
-			invalidCoverImageType: 'Das Titelbild muss eine JPEG-, PNG- oder WebP-Datei sein.',
+			invalidCoverImageType: 'Das Titelbild muss ein JPEG, PNG, WebP oder GIF sein.',
 		},
 		loan: {
 			notFound: 'Die ausgewählte Ausleihe konnte nicht gefunden werden.',

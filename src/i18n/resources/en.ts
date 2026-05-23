@@ -68,10 +68,10 @@ export const en = {
 		notAvailable: 'N/A',
 		chooseCoverImage: 'Choose cover image',
 		noCoverImageSelected: 'No image selected',
-		coverImageUploadHint: 'PNG, JPG or WebP',
+		coverImageUploadHint: 'PNG, JPG, WebP, or GIF',
 		currentCoverImage: 'Current cover image',
 		removeCoverImage: 'Remove cover image',
-		clearSelectedCoverImage: "Clear selected image",
+		clearSelectedCoverImage: 'Clear selected image',
 		coverImageMarkedForRemoval: 'Cover image will be removed',
 	},
 	adminUsers: {
@@ -182,7 +182,7 @@ export const en = {
 			isbnAlreadyExists: 'A book with this ISBN already exists.',
 			totalCopiesBelowLoanedCopies: 'Total copies cannot be lower than currently loaned copies.',
 			coverImageTooLarge: 'The cover image is too large.',
-			invalidCoverImageType: 'The cover image must be a JPEG, PNG, or WebP image.',
+			invalidCoverImageType: "The cover image must be a JPEG, PNG, WebP, or GIF."
 		},
 		loan: {
 			notFound: 'The selected loan could not be found.',

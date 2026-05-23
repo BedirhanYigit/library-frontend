@@ -24,7 +24,8 @@ export enum BookApiErrorCode {
 	NotFound = 'NOT_FOUND',
 	IsbnAlreadyExists = 'ISBN_ALREADY_EXISTS',
 	TotalCopiesBelowLoanedCopies = 'TOTAL_COPIES_BELOW_LOANED_COPIES',
-	
+	CoverImageTooLarge = 'COVER_IMAGE_TOO_LARGE',
+	InvalidCoverImageType = 'INVALID_COVER_IMAGE_TYPE',
 }
 
 export enum UserApiErrorCode {

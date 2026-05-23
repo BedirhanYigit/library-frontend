@@ -215,7 +215,7 @@ function BookFormModal({ book, isSubmitting, onSubmit, onClose }: BookFormModalP
 								className="cover-image-file-input"
 								name="coverImage"
 								type="file"
-								accept="image/png,image/jpeg,image/webp"
+								accept="image/png,image/jpeg,image/webp,image/gif"
 								onChange={handleCoverImageChange}
 								disabled={isSubmitting}
 							/>

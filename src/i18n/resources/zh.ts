@@ -68,10 +68,10 @@ export const zh = {
 		notAvailable: '无',
 		chooseCoverImage: '选择封面图片',
 		noCoverImageSelected: '未选择图片',
-		coverImageUploadHint: 'PNG、JPG 或 WebP',
+		coverImageUploadHint: 'PNG、JPG, WebP 或 GIF',
 		currentCoverImage: '当前封面图片',
 		removeCoverImage: '移除封面图片',
-		clearSelectedCoverImage: "清除所选图片",
+		clearSelectedCoverImage: '清除所选图片',
 		coverImageMarkedForRemoval: '封面图片将被移除',
 	},
 	adminUsers: {
@@ -182,7 +182,7 @@ export const zh = {
 			isbnAlreadyExists: '已有一本图书使用此 ISBN。',
 			totalCopiesBelowLoanedCopies: '总副本数不能少于当前已借出的副本数。',
 			coverImageTooLarge: '封面图片过大。',
-			invalidCoverImageType: '封面图片必须是 JPEG、PNG 或 WebP 格式。',
+			invalidCoverImageType: '封面图片必须是 JPEG、PNG、WebP 或 GIF 格式。',
 		},
 		loan: {
 			notFound: '找不到所选借阅记录。',
