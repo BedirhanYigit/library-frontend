@@ -62,9 +62,13 @@ export const en = {
 		genre: 'Genre',
 		isbn: 'ISBN',
 		totalNumberOfCopies: 'Total Number of Copies',
-		coverImageUrl: 'Cover Image URL',
+		coverImage: 'Cover image',
+		coverImagePreview: 'Cover image preview',
 		available: 'Available',
 		notAvailable: 'N/A',
+		chooseCoverImage: 'Choose cover image',
+		noCoverImageSelected: 'No image selected',
+		coverImageUploadHint: 'PNG, JPG or WebP',
 	},
 	adminUsers: {
 		backToDashboard: 'Back to Admin Dashboard',
@@ -173,6 +177,8 @@ export const en = {
 			notFound: 'The selected book could not be found.',
 			isbnAlreadyExists: 'A book with this ISBN already exists.',
 			totalCopiesBelowLoanedCopies: 'Total copies cannot be lower than currently loaned copies.',
+			coverImageTooLarge: 'The cover image is too large.',
+			invalidCoverImageType: 'The cover image must be a JPEG, PNG, or WebP image.',
 		},
 		loan: {
 			notFound: 'The selected loan could not be found.',

@@ -62,9 +62,13 @@ export const tr = {
 		genre: 'Tür',
 		isbn: 'ISBN',
 		totalNumberOfCopies: 'Toplam Kopya Sayısı',
-		coverImageUrl: 'Kapak Görseli URL',
+		coverImage: 'Kapak görseli',
+		coverImagePreview: 'Kapak görseli önizlemesi',
 		available: 'Mevcut',
 		notAvailable: 'Yok',
+		chooseCoverImage: 'Kapak görseli seç',
+		noCoverImageSelected: 'Görsel seçilmedi',
+		coverImageUploadHint: 'PNG, JPG veya WebP',
 	},
 	adminUsers: {
 		backToDashboard: 'Admin Paneline Geri Dön',
@@ -173,6 +177,8 @@ export const tr = {
 			notFound: 'Seçilen kitap bulunamadı.',
 			isbnAlreadyExists: 'Müdürüm, bu ISBN ile zaten bir kitap mevcut.',
 			totalCopiesBelowLoanedCopies: 'Toplam kopya sayısı, şu anda ödünç verilmiş kopya sayısından az olamaz.',
+			coverImageTooLarge: 'Kapak görseli çok büyük.',
+			invalidCoverImageType: 'Kapak görseli JPEG, PNG veya WebP formatında olmalıdır.',
 		},
 		loan: {
 			notFound: 'Seçilen ödünç alma kaydı bulunamadı.',

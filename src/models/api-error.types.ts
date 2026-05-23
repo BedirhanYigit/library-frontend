@@ -24,6 +24,7 @@ export enum BookApiErrorCode {
 	NotFound = 'NOT_FOUND',
 	IsbnAlreadyExists = 'ISBN_ALREADY_EXISTS',
 	TotalCopiesBelowLoanedCopies = 'TOTAL_COPIES_BELOW_LOANED_COPIES',
+	
 }
 
 export enum UserApiErrorCode {

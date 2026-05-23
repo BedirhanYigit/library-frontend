@@ -4,7 +4,6 @@ export interface BookRequest {
 	isbn: string
 	genre: string
 	numOfTotalCopies: number
-	coverImageUrl: string
 }
 
 export interface LoanRequest {
