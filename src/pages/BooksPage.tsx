@@ -7,6 +7,7 @@ import type { LoanRequest, ReservationRequest } from '../models/request.types.ts
 import { useAuth } from '../auth/useAuth.ts'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 import { notify } from '../components/notifications/notify.tsx'
+import BookCoverImage from '../components/books/BookCoverImage.tsx'
 
 const BooksPage: React.FC = () => {
 	const navigate = useNavigate()
@@ -149,6 +150,8 @@ const BooksPage: React.FC = () => {
 					<div className="entity-grid">
 						{books.map((book) => (
 							<div key={book.id} className="entity-card">
+								<BookCoverImage title={book.title} coverImageUrl={book.coverImageUrl} />
+
 								<h3 className="entity-card-title">{book.title}</h3>
 
 								<p className="entity-card-detail">

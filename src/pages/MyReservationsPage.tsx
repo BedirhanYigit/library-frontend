@@ -7,6 +7,7 @@ import { useAuth } from '../auth/useAuth.ts'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 import { formatDate } from '../i18n/dateFormatting.ts'
 import { notify } from '../components/notifications/notify.tsx'
+import BookCoverImage from '../components/books/BookCoverImage.tsx'
 
 const MyReservationsPage: React.FC = () => {
 	const navigate = useNavigate()
@@ -90,6 +91,8 @@ const MyReservationsPage: React.FC = () => {
 					<div className="entity-grid">
 						{reservations.map((reservation) => (
 							<div key={reservation.id} className="entity-card">
+								<BookCoverImage title={reservation.book.title} coverImageUrl={reservation.book.coverImageUrl} />
+
 								<h3 className="entity-card-title">
 									{reservation.book?.title || t('myReservations.unknownTitle')}
 								</h3>

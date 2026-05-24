@@ -19,15 +19,9 @@ export interface User {
 
 export interface Loan {
 	id: number
-	bookId: number
 
-	bookTitle: string
-	author?: string
-	genre?: string
-	isbn?: string
-
-	userId: number
-	userName: string
+	book: Book,
+	user: User,
 
 	loanDate: string
 	dueDate: string
@@ -39,19 +33,6 @@ export interface Reservation {
 	id: number
 	reservationDate: string
 
-	book: ReservationBook
-	user: ReservationUser
-}
-
-export interface ReservationBook {
-	bookId: number
-	title: string
-	author?: string
-	genre?: string
-	isbn: string
-}
-
-export interface ReservationUser {
-	userId: number
-	userName: string
+	book: Book
+	user: User
 }
