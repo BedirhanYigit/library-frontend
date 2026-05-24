@@ -7,6 +7,7 @@ import { useAuth } from '../auth/useAuth.ts'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 import { formatDate } from '../i18n/dateFormatting.ts'
 import { notify } from '../components/notifications/notify.tsx'
+import BookCoverImage from '../components/books/BookCoverImage.tsx'
 
 const MyBooksPage: React.FC = () => {
 	const navigate = useNavigate()
@@ -90,34 +91,36 @@ const MyBooksPage: React.FC = () => {
 
 				{!isLoading && !loadError && loans.length > 0 && (
 					<div className="entity-grid">
-						{loans.map((item) => (
-							<div key={item.id} className="entity-card">
-								<h3 className="entity-card-title">{item.bookTitle}</h3>
+						{loans.map((loan) => (
+							<div key={loan.id} className="entity-card">
+								<BookCoverImage title={loan.book.title} coverImageUrl={loan.book.coverImageUrl} />
+
+								<h3 className="entity-card-title">{loan.book.title}</h3>
 
 								<p className="entity-card-detail">
-									<strong>{t('book.author')}:</strong> {item.author || t('book.notAvailable')}
+									<strong>{t('book.author')}:</strong> {loan.book.author || t('book.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>{t('book.genre')}:</strong> {item.genre || t('book.notAvailable')}
+									<strong>{t('book.genre')}:</strong> {loan.book.genre || t('book.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>{t('book.isbn')}:</strong> {item.isbn || t('book.notAvailable')}
+									<strong>{t('book.isbn')}:</strong> {loan.book.isbn || t('book.notAvailable')}
 								</p>
 
 								<p className="entity-card-detail">
-									<strong>{t('myBooks.loanedOn')}:</strong> {formatDate(item.loanDate, i18n.language)}
+									<strong>{t('myBooks.loanedOn')}:</strong> {formatDate(loan.loanDate, i18n.language)}
 								</p>
 
 								<p className="entity-card-detail entity-card-detail-danger">
-									<strong>{t('myBooks.dueDate')}:</strong> {formatDate(item.dueDate, i18n.language)}
+									<strong>{t('myBooks.dueDate')}:</strong> {formatDate(loan.dueDate, i18n.language)}
 								</p>
 
 								<p className="book-status status-loaned">{t('myBooks.currentlyLoaned')}</p>
 
 								<div className="entity-card-actions">
-									<button className="login-btn danger-btn" onClick={() => handleReturnLoan(item.id)}>
+									<button className="login-btn danger-btn" onClick={() => handleReturnLoan(loan.id)}>
 										{t('myBooks.returnBook')}
 									</button>
 								</div>

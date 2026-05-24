@@ -8,7 +8,7 @@ import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 import { useAuth } from '../auth/useAuth.ts'
 import { notify } from '../components/notifications/notify.tsx'
 import BookFormModal from '../components/books/BookFormModal.tsx'
-import { toAssetUrl } from '../api/assets.ts'
+import BookCoverImage from '../components/books/BookCoverImage.tsx'
 
 function createBookFormData(payload: BookRequest, coverImage: File | null): FormData {
 	const formData = new FormData()
@@ -145,13 +145,9 @@ function AdminBooksPage() {
 				{!isLoading && !loadError && books.length > 0 && (
 					<div className="entity-grid">
 						{books.map((book) => {
-							const coverImageUrl = toAssetUrl(book.coverImageUrl)
-
 							return (
 								<div key={book.id} className="entity-card">
-									{coverImageUrl && (
-										<img className="entity-card-cover-image" src={coverImageUrl} alt={book.title} />
-									)}
+									<BookCoverImage title={book.title} coverImageUrl={book.coverImageUrl} />
 
 									<h3 className="entity-card-title">{book.title}</h3>
 
