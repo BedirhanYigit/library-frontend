@@ -5,6 +5,8 @@ const bookErrorMessageKeys: Record<BookApiErrorCode, string> = {
 	[BookApiErrorCode.NotFound]: 'apiErrors.book.notFound',
 	[BookApiErrorCode.IsbnAlreadyExists]: 'apiErrors.book.isbnAlreadyExists',
 	[BookApiErrorCode.TotalCopiesBelowLoanedCopies]: 'apiErrors.book.totalCopiesBelowLoanedCopies',
+	[BookApiErrorCode.CoverImageTooLarge]: 'apiErrors.book.coverImageTooLarge',
+	[BookApiErrorCode.InvalidCoverImageType]: 'apiErrors.book.invalidCoverImageType',
 }
 
 export function getBookErrorMessage(code: string, t: TranslationFunction): string | null {

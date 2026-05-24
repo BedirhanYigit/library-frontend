@@ -1,30 +1,30 @@
-import { type ChangeEvent, type SubmitEvent, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { Book } from '../models/types.ts'
-import type { BookRequest } from '../models/request.types'
-import { get, post, put } from '../api/http'
-import TextField from '../components/TextField.tsx'
+import type { BookRequest } from '../models/request.types.ts'
+import { get, postFormData, putFormData } from '../api/http.ts'
 import { getApiErrorMessage } from '../api/errors/apiErrorMessages.ts'
 import { useAuth } from '../auth/useAuth.ts'
 import { notify } from '../components/notifications/notify.tsx'
+import BookFormModal from '../components/books/BookFormModal.tsx'
+import { toAssetUrl } from '../api/assets.ts'
 
-interface BookFormData {
-	title: string
-	author: string
-	isbn: string
-	genre: string
-	numOfTotalCopies: string
-	coverImageUrl: string
-}
+function createBookFormData(payload: BookRequest, coverImage: File | null): FormData {
+	const formData = new FormData()
 
-const emptyBookForm: BookFormData = {
-	title: '',
-	author: '',
-	isbn: '',
-	genre: '',
-	numOfTotalCopies: '',
-	coverImageUrl: '',
+	formData.append(
+		'book',
+		new Blob([JSON.stringify(payload)], {
+			type: 'application/json',
+		}),
+	)
+
+	if (coverImage) {
+		formData.append('coverImage', coverImage)
+	}
+
+	return formData
 }
 
 function AdminBooksPage() {
@@ -35,11 +35,9 @@ function AdminBooksPage() {
 	const [isLoading, setIsLoading] = useState<boolean>(true)
 	const [loadError, setLoadError] = useState<string | null>(null)
 
-	const [showForm, setShowForm] = useState<boolean>(false)
-	const [editingBook, setEditingBook] = useState<Book | null>(null)
+	const [selectedBook, setSelectedBook] = useState<Book | null>(null)
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-
-	const [formData, setFormData] = useState<BookFormData>(emptyBookForm)
 
 	const { isLoading: isAuthLoading } = useAuth()
 
@@ -66,78 +64,49 @@ function AdminBooksPage() {
 		void fetchBooks()
 	}, [fetchBooks, isAuthLoading])
 
-	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target
-
-		setFormData((prev) => ({
-			...prev,
-			[name]: value,
-		}))
+	const handleAddNewClick = () => {
+		setSelectedBook(null)
+		setIsModalOpen(true)
 	}
 
 	const handleEditClick = (book: Book) => {
-		setEditingBook(book)
-
-		setFormData({
-			title: book.title,
-			author: book.author,
-			isbn: book.isbn,
-			genre: book.genre ?? '',
-			numOfTotalCopies: String(book.numOfTotalCopies),
-			coverImageUrl: book.coverImageUrl ?? '',
-		})
-
-		setShowForm(true)
-		window.scrollTo({ top: 0, behavior: 'smooth' })
+		setSelectedBook(book)
+		setIsModalOpen(true)
 	}
 
-	const handleAddNewClick = () => {
-		setEditingBook(null)
-		setFormData(emptyBookForm)
-		setShowForm(true)
-	}
-
-	const handleCancelForm = () => {
-		setShowForm(false)
-		setEditingBook(null)
-	}
-
-	const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
-		e.preventDefault()
-		setIsSubmitting(true)
-
-		const totalCopies = Number(formData.numOfTotalCopies)
-
-		if (!Number.isInteger(totalCopies) || totalCopies < 1) {
-			notify.error(t('adminBooks.totalCopiesValidation'))
-			setIsSubmitting(false)
+	const handleCloseModal = () => {
+		if (isSubmitting) {
 			return
 		}
 
-		const payload: BookRequest = {
-			title: formData.title.trim(),
-			author: formData.author.trim(),
-			isbn: formData.isbn.trim(),
-			genre: formData.genre.trim(),
-			numOfTotalCopies: totalCopies,
-			coverImageUrl: formData.coverImageUrl.trim(),
+		setIsModalOpen(false)
+		setSelectedBook(null)
+	}
+
+	const handleSubmitBook = async (payload: BookRequest, coverImage: File | null) => {
+		if (!Number.isInteger(payload.numOfTotalCopies) || payload.numOfTotalCopies < 1) {
+			notify.error(t('adminBooks.totalCopiesValidation'))
+			return
 		}
 
+		setIsSubmitting(true)
+
+		const formData = createBookFormData(payload, coverImage)
+
 		try {
-			if (editingBook) {
-				await put<Book, BookRequest>(`/books/${editingBook.id}`, payload)
+			if (selectedBook) {
+				await putFormData<Book>(`/books/${selectedBook.id}`, formData)
 				notify.success(t('adminBooks.updateSuccess'))
 			} else {
-				await post<Book, BookRequest>('/books', payload)
+				await postFormData<Book>('/books', formData)
 				notify.success(t('adminBooks.createSuccess'))
 			}
 
-			setShowForm(false)
-			setEditingBook(null)
-			setFormData(emptyBookForm)
+			setIsModalOpen(false)
+			setSelectedBook(null)
 			await fetchBooks()
 		} catch (error) {
-			const fallbackMessage = editingBook ? t('adminBooks.updateError') : t('adminBooks.createError')
+			const fallbackMessage = selectedBook ? t('adminBooks.updateError') : t('adminBooks.createError')
 			notify.error(getApiErrorMessage(error, t, fallbackMessage))
 		} finally {
 			setIsSubmitting(false)
@@ -156,76 +125,13 @@ function AdminBooksPage() {
 				</button>
 			</div>
 
-			{showForm && (
-				<div className="admin-form-container">
-					<h2>{editingBook ? t('adminBooks.updateBookDetails') : t('adminBooks.createBookTitle')}</h2>
-
-					<form className="login-form" onSubmit={handleSubmit}>
-						<TextField
-							label={t('book.title')}
-							name="title"
-							value={formData.title}
-							onChange={handleInputChange}
-							required
-						/>
-
-						<TextField
-							label={t('book.author')}
-							name="author"
-							value={formData.author}
-							onChange={handleInputChange}
-							required
-						/>
-
-						<TextField label={t('book.genre')} name="genre" value={formData.genre} onChange={handleInputChange} />
-
-						<TextField
-							label={t('book.isbn')}
-							name="isbn"
-							value={formData.isbn}
-							onChange={handleInputChange}
-							required
-						/>
-
-						<TextField
-							label={t('book.totalNumberOfCopies')}
-							name="numOfTotalCopies"
-							type="number"
-							value={formData.numOfTotalCopies}
-							onChange={handleInputChange}
-							min={1}
-							required
-						/>
-
-						<TextField
-							label={t('book.coverImageUrl')}
-							name="coverImageUrl"
-							type="url"
-							value={formData.coverImageUrl}
-							onChange={handleInputChange}
-							placeholder="https://..."
-						/>
-
-						<div className="button-group">
-							<button
-								type="button"
-								className="login-btn back-btn"
-								onClick={handleCancelForm}
-								disabled={isSubmitting}
-							>
-								{t('adminBooks.cancel')}
-							</button>
-
-							<button type="submit" className="login-btn admin-btn" disabled={isSubmitting}>
-								{isSubmitting
-									? t('adminBooks.saving')
-									: editingBook
-										? t('adminBooks.saveChanges')
-										: t('adminBooks.createBook')}
-							</button>
-						</div>
-					</form>
-				</div>
+			{isModalOpen && (
+				<BookFormModal
+					book={selectedBook}
+					isSubmitting={isSubmitting}
+					onSubmit={handleSubmitBook}
+					onClose={handleCloseModal}
+				/>
 			)}
 
 			<div className="books-container books-container-spaced">
@@ -238,36 +144,45 @@ function AdminBooksPage() {
 
 				{!isLoading && !loadError && books.length > 0 && (
 					<div className="entity-grid">
-						{books.map((book) => (
-							<div key={book.id} className="entity-card">
-								<h3 className="entity-card-title">{book.title}</h3>
+						{books.map((book) => {
+							const coverImageUrl = toAssetUrl(book.coverImageUrl)
 
-								<p className="entity-card-detail">
-									<strong>{t('book.author')}:</strong> {book.author}
-								</p>
+							return (
+								<div key={book.id} className="entity-card">
+									{coverImageUrl && (
+										<img className="entity-card-cover-image" src={coverImageUrl} alt={book.title} />
+									)}
 
-								<p className="entity-card-detail">
-									<strong>{t('book.genre')}:</strong> {book.genre || t('book.notAvailable')}
-								</p>
+									<h3 className="entity-card-title">{book.title}</h3>
 
-								<p className="entity-card-detail">
-									<strong>{t('book.isbn')}:</strong> {book.isbn}
-								</p>
+									<p className="entity-card-detail">
+										<strong>{t('book.author')}:</strong> {book.author}
+									</p>
 
-								<p className="entity-card-detail">
-									<strong>{t('book.available')}:</strong> {book.numOfCopiesAvailable} / {book.numOfTotalCopies}
-								</p>
+									<p className="entity-card-detail">
+										<strong>{t('book.genre')}:</strong> {book.genre || t('book.notAvailable')}
+									</p>
 
-								<div className="entity-card-actions">
-									<button
-										className="login-btn user-btn full-width-button compact-button"
-										onClick={() => handleEditClick(book)}
-									>
-										{t('adminBooks.updateDetails')}
-									</button>
+									<p className="entity-card-detail">
+										<strong>{t('book.isbn')}:</strong> {book.isbn}
+									</p>
+
+									<p className="entity-card-detail">
+										<strong>{t('book.available')}:</strong> {book.numOfCopiesAvailable} /{' '}
+										{book.numOfTotalCopies}
+									</p>
+
+									<div className="entity-card-actions">
+										<button
+											className="login-btn user-btn full-width-button compact-button"
+											onClick={() => handleEditClick(book)}
+										>
+											{t('adminBooks.updateDetails')}
+										</button>
+									</div>
 								</div>
-							</div>
-						))}
+							)
+						})}
 					</div>
 				)}
 			</div>

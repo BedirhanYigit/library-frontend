@@ -1,7 +1,7 @@
 import type { ApiErrorResponse } from '../models/api-error.types.ts'
 import { ApiError } from './ApiError.ts'
 
-const BASE_URL = 'http://localhost:8080'
+export const BASE_URL = 'http://localhost:8080'
 
 type RequestParams = Record<string, string | number | boolean>
 
@@ -66,6 +66,16 @@ export async function post<TResponse, TBody = unknown>(path: string, body?: TBod
 	return handleResponse<TResponse>(response)
 }
 
+export async function postFormData<T>(path: string, formData: FormData): Promise<T> {
+	const response = await fetch(createUrl(path), {
+		method: 'POST',
+		body: formData,
+		credentials: 'include',
+	})
+
+	return handleResponse<T>(response)
+}
+
 export async function put<TResponse, TBody>(path: string, body: TBody): Promise<TResponse> {
 	const response = await fetch(createUrl(path), {
 		method: 'PUT',
@@ -75,6 +85,16 @@ export async function put<TResponse, TBody>(path: string, body: TBody): Promise<
 	})
 
 	return handleResponse<TResponse>(response)
+}
+
+export async function putFormData<T>(path: string, formData: FormData): Promise<T> {
+	const response = await fetch(createUrl(path), {
+		method: 'PUT',
+		body: formData,
+		credentials: 'include',
+	})
+
+	return handleResponse<T>(response)
 }
 
 export async function deleteRequest<T>(path: string): Promise<T> {

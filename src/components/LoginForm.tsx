@@ -20,7 +20,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ loginType, onSubmit, onBack, erro
 	}
 
 	return (
-		<form onSubmit={handleSubmit} className="login-form">
+		<form onSubmit={handleSubmit} className="app-form">
 			<h2>{loginType === 'user' ? t('login.userLogin') : t('login.adminLogin')}</h2>
 
 			{errorMessage && <div className="error-message">{errorMessage}</div>}

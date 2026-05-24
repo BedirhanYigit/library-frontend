@@ -62,9 +62,17 @@ export const de = {
 		genre: 'Genre',
 		isbn: 'ISBN',
 		totalNumberOfCopies: 'Gesamtanzahl der Exemplare',
-		coverImageUrl: 'Cover-Bild-URL',
+		coverImage: 'Titelbild',
+		coverImagePreview: 'Vorschau des Titelbilds',
 		available: 'Verfügbar',
-		notAvailable: 'Nicht verfügbar',
+		notAvailable: 'k. A.',
+		chooseCoverImage: 'Titelbild auswählen',
+		noCoverImageSelected: 'Kein Bild ausgewählt',
+		coverImageUploadHint: 'PNG, JPG, WebP oder GIF',
+		currentCoverImage: 'Aktuelles Titelbild',
+		removeCoverImage: 'Titelbild entfernen',
+		clearSelectedCoverImage: 'Ausgewähltes Bild entfernen',
+		coverImageMarkedForRemoval: 'Titelbild wird entfernt',
 	},
 	adminUsers: {
 		backToDashboard: 'Zurück zum Admin-Dashboard',
@@ -174,6 +182,8 @@ export const de = {
 			isbnAlreadyExists: 'Ein Buch mit dieser ISBN existiert bereits.',
 			totalCopiesBelowLoanedCopies:
 				'Die Gesamtanzahl der Exemplare darf nicht niedriger sein als die aktuell ausgeliehenen Exemplare.',
+			coverImageTooLarge: 'Das Titelbild ist zu groß.',
+			invalidCoverImageType: 'Das Titelbild muss ein JPEG, PNG, WebP oder GIF sein.',
 		},
 		loan: {
 			notFound: 'Die ausgewählte Ausleihe konnte nicht gefunden werden.',
